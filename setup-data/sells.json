@@ -1,0 +1,28 @@
+[
+  {
+    "title": "T-shirt rouge en coton",
+    "description": "Porté qu'une seule fois, alors je préfère m'en séparer et faire un heureux via la seconde main !",
+    "owner": "Johnny",
+    "price": [14.99, "EUR"],
+    "location": "Paris",
+    "photosID": [
+      "Some photos ID",
+      "Another photo ID"],
+    "date": {"$date": "2025-11-28T17:18:07.470Z"},
+    "quantity": 1,
+    "data" : {
+      "categorie": "vetement",
+      "taille": "M",
+      "couleur": "rouge",
+      "matiere": "coton",
+      "marque": "Nike",
+      "sexe": "homme"
+    },
+    "buyers": [
+      {
+        "username": "Alice",
+        "rating": 5
+      }
+    ]
+  }
+]

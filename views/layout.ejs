@@ -1,0 +1,21 @@
+<!--
+ Structure générale de notre site web
+ Affichage le header, et charge la page passé en argument.
+ -->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= title %> • Mon Site d’Événements</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <%- include('partials/header') %>
+    
+    <%- include(page) %>
+
+</body>
+</html>

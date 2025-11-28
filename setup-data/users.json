@@ -1,0 +1,14 @@
+[
+  {
+    "username": "Johnny",
+    "passwordHash": "hashed_password_here",
+    "fullname": "John Doe",
+    "email": "johnny@test.com"
+  },
+  {
+    "username": "Alice",
+    "passwordHash": "hashed_password_here",
+    "fullname": "Alice Wonder",
+    "email": "alice@test.com"
+  }
+]

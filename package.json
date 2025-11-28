@@ -1,0 +1,30 @@
+{
+  "name": "appsinf_projetfinal_pf16",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrY3llow/APPSINF_ProjetFinal_PF16.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrY3llow/APPSINF_ProjetFinal_PF16/issues"
+  },
+  "homepage": "https://github.com/MrY3llow/APPSINF_ProjetFinal_PF16#readme",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "jest": "^30.2.0",
+    "mongodb": "^7.0.0",
+    "selenium": "^2.20.0",
+    "selenium-webdriver": "^4.38.0",
+    "supertest": "^7.1.4"
+  }
+}

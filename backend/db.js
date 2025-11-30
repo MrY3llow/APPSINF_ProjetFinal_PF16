@@ -2,98 +2,126 @@ const utils = require('./utils.js');
 const { documentSearch } = require('./document-search.js');
 
 
-//   +---------------+
-//   |   INCIDENTS   |
-//   +---------------+
-const incidents = {
+//   +-----------+
+//   |   SELLS   |
+//   +-----------+
+
+const sells = {
   
+  // Listes des entrées acceptées pour les ventes dans la base de donnée.
+  allowedFields : [
+    "title",
+    "description",
+    "owner",
+    "price",
+    "quantity",
+    "location",
+    "image",
+    "categorie",
+    "date",
+    "data"
+  ],
+
+
   /**
-   * Récupère tous les incidents de la base de données
+   * Vérifie si les valeurs d'une liste correspondent aux entrée autorisée pour les ventes
+   * de la base de donnée
+   * @param {Array<string>} options Liste de mots clés
+   * @throws {Error} `Invalid option: ${option}` si une valeur n'est pas acceptée
+   * @example ```
+   * // Ok ne retourne rien et ne lance aucune erreur.
+   * checkSellsOptions({
+   *   "title",
+   *   "description"
+   * })
+   * 
+   * // ERREUR Lance l'erreur `Invalid option: wrongValue`
+   * checkSellsOptions({
+   *   "title",
+   *   "wrongValue"
+   * })
+   * ```
+   */
+  checkSellsOptions : function(options) {
+    for (let option in options) {
+      if (!this.allowedFields.includes(option)) {
+        throw new Error(`Invalid option: ${option}`);
+      }
+    }
+  },
+
+
+  /**
+   * Crée une nouvelle vente dans la base de donnée.
+   * Les données vides ne seront pas enregistré dans la base de donnée.
    * @async
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
-   * @return {Array} Un tableau de tous les incidents. Valeurs par incidents ["description", "address", "owner", "date"]
+   * @param {Object} options - Les options de la vente. Dictionnaire
+   * @param {string} [options.title=null] - Le titre de la vente
+   * @param {string} [options.description=null] - La description de la vente
+   * @param {string} [options.owner=null] - Le propriétaire de la vente
+   * @param {Array<number|string>} [options.price=null] - Le prix au format [montant, devise]
+   * @param {number} [options.quantity=null] - La quantité disponible
+   * @param {string} [options.location=null] - La localisation
+   * @param {string} [options.image=null] - L'URL de l'image
+   * @param {string} [options.categorie=null] - La catégorie
+   * @param {Date} [options.date=new Date()] - La date de création
+   * @return {Promise<Object>} L'objet inséré dans la base de données
+   * @throws {Error} Si la requête à la base de données échoue
+   * @example
+   * await db.sells.create(dbo, {
+   *   title: "Vélo",
+   *   owner: "John",
+   *   price: [150, "EUR"],
+   *   quantity: 1
+   * });
+   */
+  create : async function(dbo, options) {
+    this.checkSellsOptions(options);
+    await dbo.collection('sells').insertOne(options);
+  },
+
+  /**
+   * 
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {Object} id - L'id de la vente
+   * @param {*} options - Dictionnaire des valeurs a changer. Seuls les valeurs de la liste sells.allowedFields sont acceptées.
+   * @throws {Error} `Invalid option: ${option}` si une valeur n'est pas acceptée
+   * @exemple ```
+   * // Change la vente avec l'id sellId et indique comme titre "Voiture" et comme description "Voiture en bonne état".
+   * await db.sells.change(dbo, sellId, {
+   *   title: "Voiture",
+   *   description: "Voiture rouge en bonne état"
+   * });
+   * ```
+   * 
+   */
+  change : async function(dbo, id, options) {
+    this.checkSellsOptions(options);
+    await dbo.collection('sells').updateOne({ _id: id }, { $set: options });
+  },
+
+  /**
+   * Récupère toutes les ventes de la base de données. Les valeurs les plus récentes sont affichées en premières.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @return {Array} Un tableau de tous les incidents.
    * @throws {Error} Si la requête à la base de données échoue
    * @exemple ```
-   * const allIncidents = await incidents.getAll(dbo);
+   * const allSells = await db.sells.getAll(dbo);
    * ```
    */
   getAll : async function(dbo) {
-    return await dbo.collection('incidents')
+    return await dbo.collection('sells')
       .find()
-      .sort({date:-1})
+      .sort({ date: -1 })
       .toArray();
   },
 
 
-  /**
-   * Créer un nouvel incident
-   * @async
-   * @param {Object} dbo - L'objet de la base de donnée MongoDB
-   * @param {string} description - La description de l'incident
-   * @param {string} address - L'adresse de l'incident
-   * @param {string} username - Le nom d'utilisateur du créateur de l'incident
-   * @param {date} date - La date de l'évènement. Default value : `new Date()`
-   * @throws {Error} Si la requête à la base de données échoue
-   * @exemple ```
-   * await incidents.create(dbo, "Chute d'arbre", "Rue du feuillage 7, 4280 Hannut", "JeanRenard", new Date());
-   * ```
-   */
-  create : async function(dbo, description, address, username, date = new Date()) {
-    await dbo.collection('incidents').insertOne({
-      description: description,
-      address: address,
-      owner: username,
-      date: date,
-    })
-  },
 
-
-  /**
-   * Renvois la liste des incidents trier dans l'ordre des plus au moins correspondant
-   * a la recherche. La recherche peut se faire avec plusieurs mots.
-   * 
-   * Utilise `utils.documentSearch()` de `/backend/utils.js`
-   * 
-   * @param {Object} dbo - L'objet de la base de donnée MongoDB
-   * @param {string} input - Le string de la recherche
-   * @return {Array} Un tableau de tous les incidents trier du plus au moins correspondant à la recherche. Valeurs par incidents ["description", "address", "owner", "date"]
-   * @throws {Error} Si la requête à la base de données échoue
-   */
-  search : async function(dbo, input) {
-
-    // Convertis les incidents en String complet avec toutes les valeurs ("{description} {address} {owner} {date}")
-    function incidentToFullString (incidents) {
-      let incidentsString = []
-      for (let incident of incidents) {
-        incidentsString.push(
-          incident.description + " " +
-          incident.address     + " " +
-          incident.owner       + " " +
-          utils.renderDateToString(incident.date, format="short", clock=true)
-        );
-      }
-      return incidentsString;
-    };
-
-    let output = []
-    let incidents = await this.getAll(dbo)
-    let incidentsString = incidentToFullString(incidents);
-
-
-    let incidentSearched = documentSearch(input, incidentsString); // String des incidents avec toutes les valeurs ("{description} {address} {owner} {date}") trier selon le terme de recherche.
-
-    for (let incidentString of incidentSearched) {
-      for (let incident of incidents) {
-        if (incidentString == incidentToFullString([incident])[0]) {
-          output.push(incident);
-        }
-      }
-    }
-      
-    return output;
-  }
-      
 }
+
 
 //   +----------+
 //   |   USER   |
@@ -205,6 +233,6 @@ const user = {
 
 
 module.exports = {
-  incidents: incidents,
   user: user,
+  sells: sells,
 }

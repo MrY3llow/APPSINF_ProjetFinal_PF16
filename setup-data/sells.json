@@ -8,8 +8,8 @@
     "location": "Louvain-la-neuve",
     "images": [],
     "date": {"$date": "2025-11-28T17:18:07.470Z"},
+    "categorie": "vetement",
     "data" : {
-      "categorie": "vetement",
       "taille": "M",
       "couleur": "rouge",
       "matiere": "coton",

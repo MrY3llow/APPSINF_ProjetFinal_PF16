@@ -88,7 +88,7 @@ async function main() {
         title: "Acceuil",
         page: "pages/index",
         username: req.session.username,
-        incidents: incidents,
+        sells: sells,
         currentDate: currentDateString,
       })
     });

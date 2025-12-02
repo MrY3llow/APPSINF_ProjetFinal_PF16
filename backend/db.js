@@ -102,7 +102,7 @@ const sells = {
   },
 
   /**
-   * Récupère toutes les ventes de la base de données. Les valeurs les plus récentes sont affichées en premières.
+   * Récupère toutes les ventes de la base de données.
    * @async
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
    * @return {Array} Un tableau de tous les incidents.
@@ -114,7 +114,6 @@ const sells = {
   getAll : async function(dbo) {
     return await dbo.collection('sells')
       .find()
-      .sort({ date: -1 })
       .toArray();
   },
 

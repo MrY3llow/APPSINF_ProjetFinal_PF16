@@ -60,6 +60,30 @@ async function main() {
     // GET Page principale (+ barre de recherche)
     app.get('/', async function(req, res) {
 
+      const currentDateString = utils.renderDateToString(new Date(), "long", clock=true); // Date actuelle affiché en bas de la page
+      let searchInput = req.query.search; // Input de la barre de recherche
+      let filterInfo = req.query.filter // Donnée de filtre
+      let sortType = req.query.sort; // Type de tri
+
+      let sells = db.sells.getAll(dbo); // Dictionnaire contenant toutes les ventes
+
+      // FILTRE
+      // Si un filtre est indiqué, retirer les éléments qui ne correspondent pas
+      if (filtreInfo) {
+        sells = utils.filter(sells, filterInfo)
+      }
+
+      // BARRE DE RECHERCHE
+      // Si une recherche a été effectué, tri les ventes selon le terme de recherche
+      if (searchInput) { 
+        sells = utils.search(sells, searchInput)
+      }
+
+      // TRI
+      // Applique le tri (date, prix)
+      sells = utils.sort(sells, sortType)
+
+
       res.render("layout", {  // Rendu de la page
         title: "Acceuil",
         page: "pages/index",

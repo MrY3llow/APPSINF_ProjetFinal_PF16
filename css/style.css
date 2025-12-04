@@ -1,0 +1,351 @@
+:root{
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-alpha: rgba(255,255,255,0.82);
+  --text: #101418;
+  --muted: #5b6672;
+  --primary: #0b57d0;
+  --primary-contrast: #ffffff;
+  --border: #e5e8ee;
+  --shadow: 0 8px 24px rgba(16,20,24,.08);
+  --radius: 16px;
+  --gap: 16px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #ffffff;
+    --surface: #495263;
+    --surface-alpha: #495263;
+    --text: #e6e9ee;
+    --muted: #a9b3bf;
+    --primary: #1a378f;
+    --primary-contrast: #bac1d6;
+    --border: #1e2430;
+    --shadow: 0 8px 24px rgba(0,0,0,.45);
+  }
+}
+
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+               Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji",
+               "Segoe UI Symbol","Noto Color Emoji";
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgb(255, 255, 255), transparent 60%),
+    radial-gradient(1000px 500px at 120% 10%, rgb(255, 255, 255), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+img{ max-width:100%; display:block; }
+
+.container{
+  max-width: 1100px;
+  width: 92vw;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+
+.site-header{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: saturate(1.2) blur(6px);
+  background: var(--surface-alpha);
+  border-bottom: 1px solid var(--border);
+}
+.header-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 14px 0;
+}
+
+.brand{ display:flex; align-items:center; gap:12px; text-decoration:none; }
+.brand-logo{ width:44px; height:44px; object-fit:contain; }
+.brand-title{
+  font-size: 1.4rem;     
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--text);
+}
+
+.site-nav{ display:flex; gap: 18px; align-items:center; }
+.nav-link{
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  opacity: .9;
+}
+.nav-link:hover{ opacity: 1; text-decoration: underline; }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--text);
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 32px;
+}
+
+.search-form {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 16px;
+  padding-right: 44px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--muted);
+}
+
+.search-btn {
+  position: absolute;
+  right: 8px;
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+  color: var(--primary);
+  background: rgb(255, 255, 255);
+}
+
+@media (max-width: 768px) {
+  .header-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .search-container {
+    order: 3;
+    flex-basis: 100%;
+    margin: 8px 0 0 0;
+    max-width: none;
+  }
+  
+  .site-nav {
+    gap: 12px;
+  }
+}
+
+.btn{
+  appearance: none;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--primary-contrast);
+  font-weight: 700;
+  box-shadow: var(--shadow);
+  cursor: not-allowed; 
+}
+.btn-outline{
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  box-shadow: none;
+  cursor: pointer;
+}
+.btn-outline:hover{ background: rgb(255, 255, 255); }
+.btn-ghost{
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+  cursor: pointer;
+}
+.btn-ghost:hover{ color: var(--text); }
+
+.card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin: 20px 0;
+}
+
+.card-head{ margin-bottom: 10px; }
+.card-title{
+  margin: 0 0 6px;
+  font-size: 1.6rem; 
+  line-height: 1.2;
+}
+.card-subtitle{ margin:0; color: var(--muted); }
+
+.form{ display: grid; gap: 18px; margin-top: 12px; }
+.field{ display: grid; gap: 20px; }
+.label{ font-weight: 700; }
+.hint{ color: var(--muted); }
+
+.input{
+  width: 100%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .2s;
+}
+.input:focus{
+  border-color: #4d84e9; 
+  box-shadow: 0 0 0 4px rgb(255, 255, 255);
+  background: var(--surface);
+}
+.input-area{ min-height: 160px; resize: vertical; }
+
+.actions{ display:flex; gap:12px; align-items:center; }
+
+.table-container {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.incidents-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+
+.incidents-table th,
+.incidents-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.incidents-table th {
+  background: var(--bg);
+  font-weight: 700;
+  color: var(--text);
+  position: sticky;
+  top: 0;
+}
+
+.incidents-table tbody tr:hover {
+  background: rgb(252, 253, 255);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+  padding: 40px 16px !important;
+}
+
+.date-info {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.date-info p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.date-info #current-date {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.profile-photo {
+  width: 10%;
+  height: 10%;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: auto; 
+  display: block;
+}
+
+.profile-dannonce {
+  width: 30%;
+  height: 30%;
+  object-fit: cover;
+}
+
+.ranking-table tbody tr:hover {
+  background: rgba(0,0,0,0.08);
+ 
+}
+.rating {
+  display: flex;
+  gap: 5px;
+  font-size: 25px;
+}
+
+.rating input {
+  display: none;
+}
+
+.rating label {
+  color: #ccc;
+  cursor: pointer;
+}
+
+.rating input:checked ~ label {
+  color: gold;
+}
+
+.rating label:hover,
+.rating label:hover ~ label {
+  color: gold;
+}
+
+.input {
+    width: 500px;
+}

@@ -1,103 +1,214 @@
-/**
- * Compte le nombre d'occurence de chaque mots dans un string.
- * 
- * @param {string} text - Chaîne de mots à analyser
- * @return {Array} Un tableau contenant :
- *  - [0] {Object} Un dictionnaire avec les mots en clés et leur nombre d'occurence en valeurs
- *  - [1] {number} Le nombre total de mots dans le texte
- * 
- * @exemple ```
- * const result = countWords("Bonjour! Bonjour le monde");
- * > result[0] = {"bonjour": 2, "le": 1, "monde": 1}
- * > result[1] = 4
- * ``` 
- * 
- * @description
- * Détails:
- * - les majuscules sont ignorée
- * - ne tiens pas compte des caractères spéciaux
- * - Les mots dans le dictionnaire sont ajouté selon l'ordre des mots dans le input.
- */
-function countWords(input) {
+function filterWords(input) {
   const text1=input.toLowerCase(); // Transforme en minuscules
-  const text2=text1.replace(/[^\p{L}\p{N}\s]/gu, ""); // Supprime tous ce qui n'est pas une lettre, un chiffre ou un espace
-  const text3=text2.trim().split(/\s+/); // Créer une liste de mots, sans les espaces du début et fin de chaîne, en découpant un ou plusieurs espaces consécutifs (espaces, tabulations, sauts de lignes, etc)
+  
+  // Liste de correspondance des accents (dans la langue française)
+  const accentList = {
+    'à': 'a', 'â': 'a', 'ä': 'a',
+    'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+    'î': 'i', 'ï': 'i',
+    'ô': 'o', 'ö': 'o',
+    'ù': 'u', 'û': 'u', 'ü': 'u',
+    'ç': 'c'
+  };
+  
+  // Liste de caractères qu'on veut remplacer par un espace
+  const spaceList = {
+    '\t':' ', '\n':' ', '\r':' ', '-':' ', "'":' '
+  };
 
-  const words_count = {};
+  // Liste de mots vides considérés inutiles (on peut l'étendre par la suite)
+  const stopWords = new Set([
+    'un', 'une', 'des', 'le', 'la', 'les', 'l', 'du', 'de', 'a', 'et', 'ou', 'mais', 'donc', 'car',
+    'que', 'qui', 'quoi', 'qu', 'dont', 'ou', 'quand', 'comment', 'pourquoi',
+    'dans', 'en', 'sur', 'sous', 'chez', 'par', 'pour', 'avec', 'sans', 'vers', 'entre',
+    'mon', 'ton', 'son', 'notre', 'votre', 'leur', 'mes', 'tes', 'ses', 'mon', 'ma', 'mes',
+    'ce', 'cet', 'cette', 'ces', 'ca', 'cela', 'ici', 'la',
+    'il', 'elle', 'ils', 'elles', 'on', 'y', 'si', 'ne', 'pas', 'plus', 'moins',
+    'ai', 'as', 'avons', 'avez', 'ont', 'ete', 'etait', 'avoir', 'avais',
+    'me', 'te', 'se', 'nous', 'vous', 'lui', 'moi', 'toi', 'soi', 'je', 'j', 'tu', 'nous', 'vous'
+  ]);
 
-  for (let i=0; i<text3.length; i+=1) {
-    if (words_count[text3[i]]) {
-      words_count[text3[i]]+=1;
+  let text2=""; 
+  
+  for (let i=0; i<text1.length; i+=1) {
+    let char=text1[i];
+    
+    if (accentList[char]) { 
+      char = accentList[char]; // Remplace les lettres accentuées par leur équivalent sans accent
     }
-    else {
-      words_count[text3[i]]=1;
+
+    if (spaceList[char]) { 
+      char = spaceList[char]; // remplace certains caractères par un espace
     }
+    
+    const isLetter=(char>='a' && char<='z'); // Vérifie si c'est une lettre minuscule
+    const isNumber=(char>='0' && char<='9'); // Vérifie si c'est un chiffre
+    const isSpace=(char==' '); // Vérifie si c'est un espace
+    if (isLetter || isNumber || isSpace) {
+      text2+=char; // Ajoute le caractère valide à la chaîne nettoyée
+    } 
   }
-  return [words_count,text3.length];
+  
+  const text3=text2.trim().split(' ').filter(word => word.length > 0); // Créer une liste de mots, sans les espaces du début et fin de chaîne, en supprimant les mots vides
+
+  const wordList = text3.filter(word => !stopWords.has(word)); // Supprime les mots vides de la liste
+
+  return wordList;
 }
 
+
+// Calcule la distance de levenshtein entre 2 strings
+function levenshtein(a, b) {
+  // si les 2 strings sont les mêmes
+  if (a==b) {
+    return 0;
+  }
+  
+  let la=a.length;
+  let lb = b.length;
+  
+  // si un des strings est vide
+  if (la==0) {
+    return lb;
+  }
+  if (lb==0) {
+      return la;
+  }
+  
+  if (la>lb) { 
+    const tmp=a;
+    a=b; 
+    b=tmp; 
+    la=a.length; 
+    lb=b.length; 
+  }
+  let prev=new Array(la+1);
+  
+  for (let i=0; i<=la; i+=1) {
+    prev[i]=i;
+  }
+  
+  for (let j=1; j<=lb; j+=1) {
+    let cur=[j];
+    const bj=b.charAt(j-1);
+    
+    for (let i=1; i<=la; i+=1) {
+      const cost=a.charAt(i-1) === bj ? 0:1;
+      const insertion=cur[i-1]+1;
+      const deletion=prev[i]+1;
+      const substitution=prev[i-1]+cost;
+      cur[i]=Math.min(insertion, deletion, substitution);
+    }
+    prev=cur;
+  }
+  return prev[la];
+}
+
+
+// renvoie une valeur de similarité de 2 strings entre 0 et 1 en utilisant 
+// la distance de levenshtein
+function similarity(a, b) {
+  if (!a || !b) {
+    return 0;
+  }
+  
+  const dist = levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length);
+  
+  if (maxLen==0) {
+    return 1;
+  }
+  
+  return 1-(dist/maxLen);
+}
+
+
 /**
- * Pour une phrase d'entrée (input) et des documents (doc_list, une suite de string), retourne
+ * Pour une phrase d'entrée (input) et des documents (docList, une liste de string), retourne
  * les documents trier dans l'ordre de correspondance à la phase d'entrée.
  * @param {string} input - La phrase d'entrée
- * @param {Array<string>} doc_list - La suite de document en string.
+ * @param {Array<string>} docList - La liste de document.
  * @return {Array<string>} - Retourne la suite des documents du plus correspondant au moins correspondant
  * @exemple ```
- * input = "J'ai mangé des pâtes au jambon, j'ai mal au ventre parce que les pâtes sont empoisonnées.";
- * doc_list = [
- *     "J'ai vu quelqu'un faire des pâtes empoisonées qui font mal au ventre.",
- *     "J'ai perdu mon chien.",
- *     "J'ai mangé une pizza au jambon.",
+ * input = "J'ai mangé des saucisses à la compote et maintenant j'ai mal au ventre aie !"
+ * docList = [
+ *     "Les saucisses de l'archiduchesse sont-elles sèches ? Archisèches !",
+ *     "Ma compote de poire pue le caca boudin.",
+ *     "Les compotes de pommes sont-elles une opération extraterrestre pour pourrire nos dents ?",
  * ];
  * 
- * > doc_list : [
- * |   "J'ai vu quelqu'un faire des pâtes empoisonées qui font mal au ventre.",
- * |   "J'ai mangé une pizza au jambon.",
- * |   "J'ai perdu mon chien."]
+ * > returns : [
+ * |   "Les compotes de pommes sont-elles une opération extraterrestre pour pourrire nos dents ?",
+ * |   "Ma compote de poire pue le caca boudin.",
+ * |   "Les saucisses de l'archiduchesse sont-elles sèches ? Archisèches !"
+ *];
  * ```
  */
-function documentSearch(input, doc_list) {
-  const wheight_list=[]; // Liste des poids
-  const doc_list_count=[];
-  
-  const input_count=countWords(input)[0]; // Contient le nombre d'occurence de chaque mots
+function documentSort(input, docList) {
+  // transforme les strings en listes de mots sans la ponctuation, accents et mots vides
+  const inputFiltered=filterWords(input);
+  const docFiltered=[];
+  const weightList=[];
 
-  for (let l=0; l<doc_list.length; l+=1) {
-    doc_list_count.push(countWords(doc_list[l]));
-    wheight_list.push(0);
+  for (let i=0; i<docList.length; i+=1) {
+    docFiltered.push(filterWords(docList[i]))
+    weightList.push(0)
   }
-  
-  for (const word in input_count) {
-    let count=0;
+
+
+  for (let i=0; i<inputFiltered.length; i+=1) {
+    const countList=[0,[]];
     
-    // compte dans combien de document le mot apparait
-    for (let i=0; i<doc_list.length; i+=1) {
-      if (doc_list_count[i][0][word]) {
-        count+=1
+    // passe une première fois dans docFiltered pour faire le compte total 
+    // d'un certain mot ou d'un mot suffisament proche dans les docs
+    // on en profite pour compter le nombre d'occurence de chaque document dans une liste
+    for (let j=0; j<docFiltered.length; j+=1) {
+      countList[1].push(0);
+      for (let k=0; k<docFiltered[j].length; k+=1) {
+        // 0.8 est enfait la valeur de similarité qu'on trouve suffisante pour
+        // considérer 2 mots comme simillaires ou prouches
+        if (similarity(inputFiltered[i],docFiltered[j][k])<0.8) {
+          countList[1][j]+=1; // le nombre d'occurence d'un mot(ou un parent) dans un doc spécifique
+        }
+      }
+      if (countList[1][j]>0) {
+        countList[0]+=1; // le nombre de doc où le mot(ou un parent) apparait
       }
     }
+    
+    // calcule le poids des mots
+    for (let j=0; j<docFiltered.length; j+=1) {
+      for (let l=0; l<docFiltered[j].length; l+=1) {
+        // si les mots sont suffisament similaires, on calcule le poids
+        if (similarity(inputFiltered[i],docFiltered[j][l])<0.8) {
+          const x=1 + (countList[1][j] / docFiltered[j].length);
+          const TF=Math.log10(x);
 
-    for (let j=0; j<doc_list.length; j+=1) {
-      if (doc_list_count[j][0][word]) {
-        const x=1 + (doc_list_count[j][0][word] / doc_list_count[j][1]);
-        const TF=Math.log10(x);
+          const y=docFiltered.length / countList[0];
+          const IDF=Math.log10(y);
 
-        const y=doc_list_count.length / count;
-        const IDF=Math.log10(y)
-
-        // ajoute le poid du mot au poid total du document
-        wheight_list[j]+=TF+IDF
+          // on utilise la même formule que pour le projet préparatoire mais
+          // on multiplie par la similarité(entre 0.8 et 1)
+          weightList[j]+=(TF+IDF)*similarity(inputFiltered[i],docFiltered[j][l])
+        }
       }
     }
   }
-  // associe chaque document à son poid et trie en fonction du poid
-  let paired=doc_list.map((str, m) => [str, wheight_list[m]]);
-  paired.sort((a, b) => b[1]-a[1]);
-  let sorted_docs=paired.map((pair) => pair[0]);
+  // Pair docList avec la liste de poids puis trie les strings de docList dans
+  // un ordre décroissant en fonction du poids
+  const paired = docList.map((doc, i) => [doc, weightList[i]]);
+  paired.sort((a, b) => b[1] - a[1]);
+  const sortedDocs = paired.map(pair => pair[0]);
   
-  return sorted_docs;
+  return [sortedDocs, inputFiltered, docFiltered, weightList]
 }
 
-module.exports = {
-  documentSearch: documentSearch
-}
+
+let string1 = "J'ai mangé des saucisses à la compote et maintenant j'ai mal au ventre aie !"
+let string2 = "Les saucisses de l'archiduchesse sont-elles sèches ? Archisèches !"
+let string3 = "Ma compote de poire pue le caca boudin."
+let string4 = "Les compotes de pommes sont-elles une opération extraterrestre pour pourrire nos dents ?"
+
+let stringList = [string2, string3, string4]
+
+console.log(documentSort(string1, stringList));

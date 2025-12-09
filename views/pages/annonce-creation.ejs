@@ -4,7 +4,7 @@
       <h1 class="card-title">Créer une annonce</h1>
     </header>
 
-    <form class="form">
+    <form class="form" method="POST" enctype="multipart/form-data">
 
       <!-- INPUT >   Title -->
       <div class="field">
@@ -17,7 +17,18 @@
         <label for="description" class="label">Description</label>
         <textarea id="description" name="description" class="input input-area" placeholder="Description de la vente"><%= descriptionInput %></textarea>
       </div>
-      
+
+      <!-- INPUT > Image -->
+      <div class="field">
+        <label for="image" class="label">Image</label>
+        <div class="image-upload-container">
+          <label for="image" class="image-upload-btn">Choisir une image</label>
+          <input id="image" type="file" name="image" class="image-input" accept="image/*">
+          <img id="preview" class="preview-img" alt="Aperçu">
+        </div>
+        <small class="field-hint">Formats acceptés : JPG, PNG, WEBP. Taille max : 5 MB</small>
+      </div>
+            
       <!-- INPUT >   Adresse -->
       <div class="field">
         <label for="address" class="label">Address</label>
@@ -74,4 +85,23 @@
 
     </form>
   </section>
+
+  <script>
+    document.getElementById('image').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('preview');
+      
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.classList.add('show');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.classList.remove('show');
+      }
+    });
+  </script>
+
 </main>

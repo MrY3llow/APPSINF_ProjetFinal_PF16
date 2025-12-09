@@ -401,3 +401,19 @@ img{ max-width:100%; display:block; }
 .preview-img.show {
   display: block;
 }
+
+
+/*--------------------------*/
+/*------- Products Grid ----*/
+/*--------------------------*/
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.product-price {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 12px 0;
+}

@@ -350,3 +350,54 @@ img{ max-width:100%; display:block; }
 .input-area {
   font-family: inherit;
 }
+
+
+
+
+/*---------------------------------------*/
+/*------- IMAGE PREVIEW & UPLOAD --------*/
+/*---------------------------------------*/
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.image-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.image-input {
+  display: none; /* Cache l'input file par défaut */
+}
+
+.image-upload-btn {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--primary-contrast);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.image-upload-btn:hover {
+  opacity: 0.9;
+}
+
+.preview-img {
+  display: none;
+  width: auto;
+  max-height: 150px; /* Hauteur max */
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.preview-img.show {
+  display: block;
+}

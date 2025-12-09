@@ -12,8 +12,15 @@ var fs = require('fs');
 const { checkUserInput } = require('./backend/check-input.js');
 const db = require('./backend/db.js');
 const utils = require('./backend/utils.js');
+const multer = require('multer'); // Permet de gérer les upload d'iamge
 
 MongoClient = require('mongodb').MongoClient;
+
+// Configuration de multer pour stocker les fichiers en mémoire
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 } // Limite à 5 MB
+});
 
 
 //   +--------------------------------+
@@ -64,7 +71,7 @@ async function main() {
       // let filterInfo = req.query.filter // Donnée de filtre
       // let sortType = req.query.sort; // Type de tri
 
-      // let sells = db.sells.getAll(dbo); // Dictionnaire contenant toutes les ventes
+      let sells = db.sells.getAll(dbo); // Dictionnaire contenant toutes les ventes
 
       // // FILTRE
       // // Si un filtre est indiqué, retirer les éléments qui ne correspondent pas
@@ -87,7 +94,7 @@ async function main() {
         title: "Acceuil",
         page: "pages/index",
         username: req.session.username,
-        // sells: sells
+        sells: sells,
       })
     })
 
@@ -249,7 +256,7 @@ async function main() {
 
 
     // Post ANNONCE CREATION
-    app.post('/annonce-creation', async function(req, res) {
+    app.post('/annonce-creation', upload.single('image'), async function(req, res) {
       let title = req.body.title;
       let description = req.body.description;
       let price = req.body.price;
@@ -260,11 +267,29 @@ async function main() {
 
       let error = "";
 
+      // Récupérer l'image uploadée
+      let imageData = null;
+      if (req.file) {
+        imageData = {
+          contentType: req.file.mimetype, // 'image/jpeg', 'image/png', etc.
+          data: req.file.buffer.toString('base64'), // Conversion en Base64
+          size: req.file.size,
+          filename: req.file.originalname
+        };
+      }
+
       // Vérification des conditions
       if (!checkUserInput.isValidIncidentAddress(address)) {
-        error = "L'addresse doit faire plus de 15 caractères."
-      } else {
-        try { // Vérification passée, tentative de création d'incident avec la DB
+        error = "L'adresse doit faire plus de 15 caractères.";
+      } 
+      else if (!req.file) {
+        error = "Une image est requise.";
+      }
+      else if (req.file.size > 5 * 1024 * 1024) {
+        error = "L'image ne doit pas dépasser 5 MB.";
+      }
+      else {
+        try {
           await db.sells.create(dbo, {
             owner: req.session.username,
             title: title,
@@ -274,9 +299,11 @@ async function main() {
             state: state,
             category: category,
             address: address,
+            image: imageData
           })
-        } catch {
-          error = "Une erreur est survenue avec la base de donnée."
+        } catch (err) {
+          console.error(err);
+          error = "Une erreur est survenue avec la base de donnée.";
         }
       }
 
@@ -286,19 +313,20 @@ async function main() {
           page: "pages/annonce-creation",
           username: req.session.username,
           error: error,
-          titleInput: titleInput,
-          descriptionInput: descriptionInput,
-          priceInput: priceInput,
-          quantityInput: quantityInput,
-          stateInput: stateInput,
+          titleInput: title,
+          descriptionInput: description,
+          priceInput: price,
+          quantityInput: quantity,
+          stateInput: state,
           categoryList: categoryList,
-          categoryInput: categoryInput,
-          addressInput: addressInput,
-        })
+          categoryInput: category,
+          addressInput: address,
+          error: error,
+        });
       } else {
         res.redirect("/");
       }
-    })
+    });
 
 
 

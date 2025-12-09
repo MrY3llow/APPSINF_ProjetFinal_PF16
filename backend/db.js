@@ -15,9 +15,10 @@ const sells = {
     "owner",
     "price",
     "quantity",
-    "location",
+    "address",
     "image",
-    "categorie",
+    "category",
+    "state",
     "date",
     "data"
   ],

@@ -1,0 +1,41 @@
+<main class="container">
+  <section class="card">
+    <header class="card-head">
+      <h1 class="card-title">Identification</h1>
+      <p class="card-subtitle">Connectez-vous à votre compte</p>
+    </header>
+    
+    <!-- Formulaire pour se connecter -->
+    <form class="form" method="POST">
+
+      <!-- Username -->
+      <div class="field">
+        <label for="login-username" class="label">Nom d'utilisateur</label>
+        <input type="text" id="login-username" name="username" class="input" placeholder="Entrez votre nom d'utilisateur" value="<%= usernameInput %>">
+      </div>
+      
+      <!-- Password -->
+      <div class="field">
+        <label for="login-password" class="label">Mot de passe</label>
+        <input type="password" id="login-password" name="password" class="input" placeholder="Entrez votre mot de passe">
+      </div>
+      
+      <!-- Bouton pour valider et se connecter -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+      </div>
+      
+      <!-- Message d'erreur qui s'affiche s'il existe -->
+      <% if (error) { %>
+      <div class="error-message">
+        <p><%- error.replace(/\n/g, '<br>') %></p>
+      </div>
+      <% } %>
+    </form>
+    
+  <!-- Bouton pour afficher la page de création de compte -->
+  <a href="signup" class="form-link" style="display:block; margin-top:1em;">
+    Pas encore de compte ?
+  </a>
+  </section>
+</main>

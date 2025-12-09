@@ -204,11 +204,11 @@ function documentSort(input, docList) {
 }
 
 
-let string1 = "J'ai mangé des saucisses à la compote et maintenant j'ai mal au ventre aie !"
-let string2 = "Les saucisses de l'archiduchesse sont-elles sèches ? Archisèches !"
-let string3 = "Ma compote de poire pue le caca boudin."
-let string4 = "Les compotes de pommes sont-elles une opération extraterrestre pour pourrire nos dents ?"
+// let string1 = "J'ai mangé des saucisses à la compote et maintenant j'ai mal au ventre aie !"
+// let string2 = "Les saucisses de l'archiduchesse sont-elles sèches ? Archisèches !"
+// let string3 = "Ma compote de poire pue le caca boudin."
+// let string4 = "Les compotes de pommes sont-elles une opération extraterrestre pour pourrire nos dents ?"
 
-let stringList = [string2, string3, string4]
+// let stringList = [string2, string3, string4]
 
-console.log(documentSort(string1, stringList));
+// console.log(documentSort(string1, stringList));

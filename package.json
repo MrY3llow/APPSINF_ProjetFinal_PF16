@@ -19,6 +19,7 @@
   "homepage": "https://github.com/MrY3llow/APPSINF_ProjetFinal_PF16#readme",
   "dependencies": {
     "crypto": "^1.0.1",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "jest": "^30.2.0",

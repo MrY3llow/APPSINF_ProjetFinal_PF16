@@ -1,3 +1,5 @@
+/* Lamine */
+
 :root{
   --bg: #f6f7fb;
   --surface: #ffffff;
@@ -86,27 +88,14 @@ img{ max-width:100%; display:block; }
 }
 .nav-link:hover{ opacity: 1; text-decoration: underline; }
 
-.user-info {
-  display: flex;
-  align-items: center;
-  margin-left: 16px;
-}
 
-.user-name {
-  font-weight: 600;
-  color: var(--text);
-  padding: 8px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-}
 
 .header-right {
   display: flex;
   align-items: center;
 }
 
+/* Styles pour la barre de recherche */
 .search-container {
   flex: 1;
   max-width: 400px;
@@ -162,6 +151,7 @@ img{ max-width:100%; display:block; }
   background: rgb(255, 255, 255);
 }
 
+/* Responsive pour la barre de recherche */
 @media (max-width: 768px) {
   .header-row {
     flex-wrap: wrap;
@@ -189,7 +179,6 @@ img{ max-width:100%; display:block; }
   color: var(--primary-contrast);
   font-weight: 700;
   box-shadow: var(--shadow);
-  cursor: not-allowed; 
 }
 .btn-outline{
   background: transparent;
@@ -229,6 +218,14 @@ img{ max-width:100%; display:block; }
 .label{ font-weight: 700; }
 .hint{ color: var(--muted); }
 
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 0px 10px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
 .input{
   width: 100%;
   border: 1.5px solid var(--border);
@@ -248,6 +245,9 @@ img{ max-width:100%; display:block; }
 
 .actions{ display:flex; gap:12px; align-items:center; }
 
+/*--------------------------*/
+/*------- Table styles -----*/
+/*--------------------------*/
 .table-container {
   overflow-x: auto;
   margin: 20px 0;
@@ -285,6 +285,9 @@ img{ max-width:100%; display:block; }
   padding: 40px 16px !important;
 }
 
+/*--------------------------*/
+/*------- Date info --------*/
+/*--------------------------*/
 .date-info {
   margin-top: 16px;
   padding-top: 16px;
@@ -310,12 +313,6 @@ img{ max-width:100%; display:block; }
   border-radius: 50%;
   margin: auto; 
   display: block;
-}
-
-.profile-dannonce {
-  width: 30%;
-  height: 30%;
-  object-fit: cover;
 }
 
 .ranking-table tbody tr:hover {
@@ -348,4 +345,8 @@ img{ max-width:100%; display:block; }
 
 .input {
     width: 500px;
+}
+
+.input-area {
+  font-family: inherit;
 }

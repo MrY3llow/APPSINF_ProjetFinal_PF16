@@ -1,34 +1,34 @@
 <header class="site-header">
-<div class="container header-row">
+  <div class="container header-row">
 
     <!-- Logo -->
-    <a class="brand" href="/" aria-label="Accueil">
-    <img src="logo.png" alt="Logo du site" class="brand-logo">
-    <span class="brand-title">Tracker</span>
+    <a class="brand" href="index.html">
+      <img src="LOGO.png" alt="Logo" class="brand-logo">
+      <span class="brand-title">Louvain-la-Vente</span>
     </a>
 
     <!-- Recherche -->
     <div class="search-container">
-    <form class="search-form" role="search" aria-label="Rechercher des incidents" method="GET" action="/">
+      <form class="search-form" role="search" aria-label="Rechercher des incidents" method="GET" action="/">
         <input type="search" class="search-input" placeholder="Rechercher des incidents..." aria-label="Rechercher des incidents" name="search">
     </form>
     </div>
 
     <!-- Partie alignée à droite du header (Acceuil, login, signup, création d'accident, page de profil) -->
     <div class="header-right">
-    <nav class="site-nav" aria-label="Navigation principale">
+      <nav class="site-nav" aria-label="Navigation principale">
         <a href="/" class="nav-link">Accueil</a>
         <!-- Affiche les boutons de connexion uniquement si l'utilisateur n'est pas connecté. -->
         <% if(username == undefined) { %>
-            <a href="login" class="nav-link">Connexion</a>
-            <a href="signup" class="nav-link">Inscription</a>
+          <a href="login" class="nav-link">Connexion</a>
+          <a href="signup" class="nav-link">Inscription</a>
         <% } %>
-        <a href="incident-creation" class="nav-link btn btn-outline">Créer un événement</a>
+        <a href="annonce-creation" class="nav-link btn btn-outline">Créer une vente</a>
         <% if(username != undefined) { %>
-            <a href="profil" class="nav-link btn-ghost"><%= username %></a>
+          <a href="profile" class="nav-link btn-ghost"><%= username %></a>
         <% } %>
-    </nav>
+      </nav>
 
     </div>
-</div>
+  </div>
 </header>

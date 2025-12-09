@@ -1,0 +1,56 @@
+<!-- Anes -->
+
+<main class="container">
+  <section class="card">
+    <header class="card-head">
+      <h1 class="card-title">Création de compte</h1>
+      <p class="card-subtitle">Inscrivez-vous pour accéder au site</p>
+    </header>
+
+    <!-- Formulaire pour s'inscrire -->
+    <form class="form" method="POST">
+
+      <!-- Username -->
+      <div class="field">
+        <label for="signup-username" class="label">Nom d'utilisateur</label>
+        <input type="text" id="signup-username" name="username" class="input" placeholder="Choisissez votre nom d'utilisateur" value="<%= usernameInput %>">
+      </div>
+      
+      <!-- Password -->
+      <div class="field">
+        <label for="signup-password" class="label">Mot de passe</label>
+        <input type="password" id="signup-password" name="password" class="input" placeholder="Choisissez votre mot de passe">
+        <input type="password" id="signup-password" name="passwordCopy" class="input" placeholder="Recopiez votre mot de passe">
+      </div>
+      
+      <!-- fullname -->
+      <div class="field">
+        <label for="fullname" class="label">Nom complet</label>
+        <input type="text" id="fullname" name="fullname" class="input" placeholder="Entrez votre nom et prénom" value="<%= fullnameInput %>">
+      </div>
+      
+      <!-- email -->
+      <div class="field">
+        <label for="email" class="label">Courrier électronique</label>
+        <input type="email" id="email" name="email" class="input" placeholder="Entrez votre adresse e-mail" value="<%= emailInput %>">
+      </div>
+      
+      <!-- Bouton pour valider et s'inscrire -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
+      </div>
+      
+      <!-- Bouton pour afficher la page de connexion -->
+      <a href="login" class="form-link" style="display:block; margin-top:0.3em;">
+        Retourner à la page d'identification
+      </a>
+
+      <!-- Message d'erreur qui s'affiche s'il existe -->
+      <% if (error) { %>
+        <div class="error-message">
+          <p><%- error.replace(/\n/g, '<br>') %></p>
+        </div>
+      <% } %>
+    </form>
+  </section>
+</main>

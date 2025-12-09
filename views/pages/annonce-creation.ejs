@@ -1,0 +1,77 @@
+<main class="container">
+  <section class="card">
+    <header class="card-head">
+      <h1 class="card-title">Créer une annonce</h1>
+    </header>
+
+    <form class="form">
+
+      <!-- INPUT >   Title -->
+      <div class="field">
+        <label for="title" class="label">Titre</label>
+        <input id="title" type="text" name="title" class="input" placeholder="Titre de la vente" value="<%= titleInput %>">
+      </div>
+
+      <!-- INPUT >   Description -->
+      <div class="field">
+        <label for="description" class="label">Description</label>
+        <textarea id="description" name="description" class="input input-area" placeholder="Description de la vente"><%= descriptionInput %></textarea>
+      </div>
+      
+      <!-- INPUT >   Adresse -->
+      <div class="field">
+        <label for="address" class="label">Address</label>
+        <input id="address" type="text" name="address" class="input" placeholder="Adresse" value="<%= addressInput %>">
+      </div>
+
+      <!-- INPUT >   Prix -->
+      <div class="field">
+        <label for="price" class="label">Prix</label>
+        <input id="price" type="number" name="price" class="input" placeholder="Prix" value="<%= priceInput %>" min="0.01" step="0.01">
+      </div>
+
+      <!-- INPUT >   Quantité -->
+      <div class="field">
+        <label for="quantity" class="label">Quantité</label>
+        <input id="quantity" type="number" name="quantity" class="input" placeholder="Quantité" value="<%= quantityInput %>" min="1" step="1">
+      </div>
+
+      <!-- INPUT >   Etat -->
+      <div class="field">
+        <label for="state" class="label">État</label>
+        <input id="state" type="text" name="adresse" class="input" placeholder="État" value="<%= stateInput %>">
+      </div>
+
+      <!-- SELECT >   Catégorie -->
+      <div class="field">
+        <label for="category" class="label">Catégorie</label>
+        <select id="category" name="category" class="input" required>
+          <% if (!categoryInput) { %>
+            <option value="" disabled selected>Sélectionnez une catégorie</option>
+          <% } %>
+          <% for(let category of categoryList) { %>
+            <% if (category[0] == categoryInput) { %>
+              <option value="<%= category[0] %>" selected><%= category[1] %></option>
+            <% } else {  %>
+              <option value="<%= category[0] %>"><%= category[1] %></option>
+            <% } %>
+              
+          <% } %>
+        </select>
+      </div>
+      
+      <!-- BUTTON >   ENvoyer le formulaire -->
+      <div class="actions">
+        <button class="btn" type="submit">Publier votre annonce </button>
+      </div>
+
+      <!-- Message d'erreur qui s'affiche s'il existe -->
+      <% if (error) { %>
+        <div class="error-message">
+          <p><%- error.replace(/\n/g, '<br>') %></p>
+        </div>
+      <% } %>
+
+    </form>
+  </section>
+</main>

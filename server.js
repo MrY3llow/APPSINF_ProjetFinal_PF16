@@ -60,38 +60,251 @@ async function main() {
     // GET Page principale (+ barre de recherche)
     app.get('/', async function(req, res) {
 
-      const currentDateString = utils.renderDateToString(new Date(), "long", clock=true); // Date actuelle affiché en bas de la page
-      let searchInput = req.query.search; // Input de la barre de recherche
-      let filterInfo = req.query.filter // Donnée de filtre
-      let sortType = req.query.sort; // Type de tri
+      // let searchInput = req.query.search; // Input de la barre de recherche
+      // let filterInfo = req.query.filter // Donnée de filtre
+      // let sortType = req.query.sort; // Type de tri
 
-      let sells = db.sells.getAll(dbo); // Dictionnaire contenant toutes les ventes
+      // let sells = db.sells.getAll(dbo); // Dictionnaire contenant toutes les ventes
 
-      // FILTRE
-      // Si un filtre est indiqué, retirer les éléments qui ne correspondent pas
-      if (filtreInfo) {
-        sells = utils.filter(sells, filterInfo)
-      }
+      // // FILTRE
+      // // Si un filtre est indiqué, retirer les éléments qui ne correspondent pas
+      // if (filterInfo) {
+      //   sells = utils.filter(sells, filterInfo)
+      // }
 
-      // BARRE DE RECHERCHE
-      // Si une recherche a été effectué, tri les ventes selon le terme de recherche
-      if (searchInput) { 
-        sells = utils.search(sells, searchInput)
-      }
+      // // BARRE DE RECHERCHE
+      // // Si une recherche a été effectué, tri les ventes selon le terme de recherche
+      // if (searchInput) { 
+      //   sells = utils.search(sells, searchInput)
+      // }
 
-      // TRI
-      // Applique le tri (date, prix)
-      sells = utils.sort(sells, sortType)
+      // // TRI
+      // // Applique le tri (date, prix)
+      // sells = utils.sort(sells, sortType)
 
 
       res.render("layout", {  // Rendu de la page
         title: "Acceuil",
         page: "pages/index",
         username: req.session.username,
-        sells: sells,
-        currentDate: currentDateString,
+        // sells: sells
+      })
+    })
+
+    // Get LOGIN 
+    app.get('/login', async function(req, res) {
+      if(req.session.username) {
+        res.redirect('/');
+      }
+
+      else {
+        res.render("layout", {
+          title: "Connection",
+          page: "pages/login",
+          username: undefined,
+          usernameInput: req.query.username,
+          error: req.session.loginErrorMessage,
+        })
+      }
+    });
+
+    // Post LOGIN
+    app.post('/login', async function(req, res) {
+      let username = req.body.username;
+      let password = req.body.password;
+
+      if (await db.user.checkLogin(dbo, username, password)) {
+        req.session.username = username;
+        delete req.session.loginErrorMessage;
+        if (req.session.previousPageBeforeLoginPage != undefined) {
+          res.redirect(req.session.previousPageBeforeLoginPage);
+          delete req.session.previousPageBeforeLoginPage
+        } else {
+          res.redirect('/');
+        }
+      } else {
+        req.session.loginErrorMessage = "Identifiants incorrects";
+        res.render("layout", {
+          title: "Connection",
+          page: "pages/login",
+          username: req.session.username,
+          usernameInput: username,
+          error: req.session.loginErrorMessage,
+        });
+      }
+    });
+
+
+    // Get SIGNUP
+    app.get('/signup', async function(req, res) {
+      res.render("layout", {
+        title: "Inscription",
+        page: "pages/signup",
+        usernameInput: null,
+        emailInput: null,
+        fullnameInput: null,
+        username: req.session.username,
+        error: undefined,
       })
     });
+
+    // Post SIGNUP
+    app.post('/signup', async function(req, res) {
+      let username = req.body.username;
+      let password = req.body.password;
+      let passwordCopy = req.body.passwordCopy;
+      let fullname = req.body.fullname;
+      let email = req.body.email;
+
+      delete req.session.signupErrorMessage;
+
+      // Vérification des conditions de création d'un compte
+      if (!checkUserInput.isValidUsername(username)) { // Est-ce que l'username est valide
+        req.session.signupErrorMessage = "Le nom d'utilisateur n'est pas valide."
+      }
+      else if (!await db.user.isUsernameFree(dbo, username)) { // Est-ce que l'username est libre
+        req.session.signupErrorMessage = "Ce nom d'utilisateur est déjà utilisé."
+      }
+      else if (!await db.user.isEmailFree(dbo, email)) { // Est-ce que l'email est libre
+        req.session.signupErrorMessage = "Cet email est déjà utilisé."
+      }
+      else if (password != passwordCopy) { // Est-ce que les deux password complété correspondent
+        req.session.signupErrorMessage = "Les deux mots de passe ne correspondent pas."
+      } 
+      else if (!checkUserInput.isValidPassword(password)) {  // Est-ce que le mot de passe est valide
+        req.session.signupErrorMessage = "Le mot de passe n'est pas valide. Il doit :\n- faire plus de 8 caractères"
+      }
+
+      // Si les conditions sont OK, tentative de création de compte dans la database
+      if (req.session.signupErrorMessage == undefined) {
+        try {
+          await db.user.create(dbo, username, password, username, email)
+        } catch (err) {
+          req.session.signupErrorMessage = "Une erreur est survenue avec la base de données."
+        }
+      }
+
+      // Erreur > Rechargement de la page signup avec les inputs précomplété (pour
+      // les données non sensibles) et affiche le message d'erreur.
+      if (req.session.signupErrorMessage) {
+        res.render("layout", {
+          title: "Connection",
+          page: "pages/signup",
+          usernameInput: username,
+          fullnameInput: fullname,
+          emailInput: email,
+          error: req.session.signupErrorMessage,
+          username: req.session.username,
+        });
+      
+      // Aucune erreur > Charge la page d'acceuil en étant connecté
+      } else {
+        req.session.username = username,
+        res.redirect('/');
+      }
+    });
+
+
+    // Get PROFILE
+    app.get('/profile', async function(req, res) {
+      res.render("layout", {
+        title: "Inscription",
+        page: "pages/profile",
+        username: req.session.username,
+        error: undefined,
+      })
+    });
+
+    // Liste des catégories autorisée pour la création d'une vente. Temporaire
+    const categoryList = [
+      ["vehicule", "Véhicule"],
+      ["decoration", "Décoration"],
+      ["vetement", "Vêtement"]
+    ]
+
+    // Get ANNONCE CREATION
+    app.get('/annonce-creation', function(req, res) {
+      if(req.session.username == undefined) {
+        req.session.loginErrorMessage = "Une connexion est nécessaire pour créer une annonce.";
+        req.session.previousPageBeforeLoginPage = '/annonce-creation';
+        res.redirect('/login');
+      }
+      else {
+        res.render("layout", {
+          title: "Création d'une vente",
+          page: "pages/annonce-creation",
+          username: req.session.username,
+          error: null,
+          titleInput: null,
+          descriptionInput: null,
+          priceInput: null,
+          quantityInput: null,
+          stateInput: null,
+          categoryList: categoryList,
+          categoryInput: null,
+          addressInput: null,
+        })
+      }
+    });
+
+
+    // Post ANNONCE CREATION
+    app.post('/annonce-creation', async function(req, res) {
+      let title = req.body.title;
+      let description = req.body.description;
+      let price = req.body.price;
+      let quantity = req.body.quantity;
+      let state = req.body.state;
+      let category = req.body.category;
+      let address = req.body.address;
+
+      let error = "";
+
+      // Vérification des conditions
+      if (!checkUserInput.isValidIncidentAddress(address)) {
+        error = "L'addresse doit faire plus de 15 caractères."
+      } else {
+        try { // Vérification passée, tentative de création d'incident avec la DB
+          await db.sells.create(dbo, {
+            owner: req.session.username,
+            title: title,
+            description: description,
+            price: price,
+            quantity: quantity,
+            state: state,
+            category: category,
+            address: address,
+          })
+        } catch {
+          error = "Une erreur est survenue avec la base de donnée."
+        }
+      }
+
+      if (error) {
+        res.render("layout", {
+          title: "Création d'une vente",
+          page: "pages/annonce-creation",
+          username: req.session.username,
+          error: error,
+          titleInput: titleInput,
+          descriptionInput: descriptionInput,
+          priceInput: priceInput,
+          quantityInput: quantityInput,
+          stateInput: stateInput,
+          categoryList: categoryList,
+          categoryInput: categoryInput,
+          addressInput: addressInput,
+        })
+      } else {
+        res.redirect("/");
+      }
+    })
+
+
+
+
+
+
 
 
 

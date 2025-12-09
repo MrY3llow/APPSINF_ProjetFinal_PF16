@@ -35,21 +35,6 @@ const checkuserInput = {
     },
 
     /**
-     * Vérifie qu'un String respecte bien les conditions d'une DESCRIPTION D'ACCIDENT.
-     * 
-     * Conditions :
-     * - faire plus de 20 caractères
-     * @param {string} input - La description à vérifier
-     * @return {boolean} True s'il est valide. False s'il n'est pas valide
-     */
-    isValidIncidentDescription : function(input) {
-        if (input.length >= 20) {
-            return true;
-        }
-        return false;
-    },
-
-    /**
      * Vérifie qu'un String respecte bien les conditions d'une ADDRESSE.
      * 
      * Conditions :

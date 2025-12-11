@@ -128,9 +128,10 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  
+  // Script pour la gestion des sous-dropdowns
   const categorySelect = document.getElementById('category-select');
-
-  const subDropdowns = [
+  const subDropdownsVehicule = [
     document.getElementById('vehi-mileage-field'),
     document.getElementById('vehi-brand-field'),
     document.getElementById('vehi-type-field'),
@@ -140,9 +141,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // montre les dropdowns des sous-catégories en fonction de la catégorie principale sélectionnée
   function toggleCat() {
     if (categorySelect.value === 'Véhicule') {
-      subDropdowns.forEach(drop => drop.style.display = 'block');
+      subDropdownsVehicule.forEach(drop => drop.style.display = 'block');
     } else {
-      subDropdowns.forEach(drop => {
+      subDropdownsVehicule.forEach(drop => {
         drop.style.display = 'none';
         drop.querySelector('.dropdown-options').style.display = 'none';
       });
@@ -153,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
   categorySelect.addEventListener('change', toggleCat);
 
   // Gestion de l'affichage des options dans les sous-dropdowns
-  subDropdowns.forEach(drop => {
+  subDropdownsVehicule.forEach(drop => {
     const btn = drop.querySelector('.dropdown-toggle');
     const options = drop.querySelector('.dropdown-options');
     btn.addEventListener('click', () => {

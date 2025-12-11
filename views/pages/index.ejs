@@ -1,9 +1,9 @@
 <main class="page-layout">
-  
+
   <!-- Barre latérale gauche avec les filtres de recherche -->
   <div class="left-space-wrapper">
     <aside class="left-space">
-      
+
       <!-- Barre d'input pour définir un prix min et max -->
       <div class="toolbox-inputs">
         <div class="field">
@@ -22,7 +22,7 @@
           <select id="category-select" class="input">
             <option value=""> ~ </option>
             <option value="Véhicule">Véhicule</option>
-            <option value="Vêtements">Vêtemens</option>
+            <option value="Vêtements">Vêtements</option>
             <option value="Jouets">Jouets</option>
             <option value="Meubles">Meubles</option>
             <option value="Accessories">Accessoires</option>
@@ -30,57 +30,53 @@
         </div>
 
         <div class="separator"></div>
-        
-        <!-- Sous-catégories qui s'affichent uniquement si "Véhicule" est sélectionné -->
+
+        <!-- Sous-catégories multi-select qui s'affichent uniquement si "Véhicule" est sélectionné -->
         <div id="vehi-mileage-field" class="sub-dropdown" style="display: none;">
-          <label class="label" for="vehi-mileage-select">Kilométrage</label>
-          <select id="vehi-mileage-select" class="input">
-            <option value=""> ~ </option>
-            <option value="0-5000">0 - 5 000 km</option>
-            <option value="5000-20000">5 000 - 20 000 km</option>
-            <option value="20000-50000">20 000 - 50 000 km</option>
-            <option value="50000+">50 000 km+</option>
-          </select>
+          <button class="dropdown-toggle">Kilométrage</button>
+          <div class="dropdown-options">
+            <label><input type="checkbox" value="0-5000">0 - 5 000 km</label>
+            <label><input type="checkbox" value="5000-20000">5 000 - 20 000 km</label>
+            <label><input type="checkbox" value="20000-50000">20 000 - 50 000 km</label>
+            <label><input type="checkbox" value="50000+">50 000 km+</label>
+          </div>
         </div>
 
         <div id="vehi-brand-field" class="sub-dropdown" style="display: none;">
-          <label class="label" for="vehi-brand-select">Marque</label>
-          <select id="vehi-brand-select" class="input">
-            <option value=""> ~ </option>
-            <option value="volvo">Volvo</option>
-            <option value="toyota">Toyota</option>
-            <option value="ferrari">Ferrari</option>
-            <option value="volkswagen">Volkswagen</option>
-          </select>
+          <button class="dropdown-toggle">Marque</button>
+          <div class="dropdown-options">
+            <label><input type="checkbox" value="volvo">Volvo</label>
+            <label><input type="checkbox" value="toyota">Toyota</label>
+            <label><input type="checkbox" value="ferrari">Ferrari</label>
+            <label><input type="checkbox" value="volkswagen">Volkswagen</label>
+          </div>
         </div>
 
         <div id="vehi-type-field" class="sub-dropdown" style="display: none;">
-          <label class="label" for="vehi-type-select">Type</label>
-          <select id="vehi-type-select" class="input">
-            <option value=""> ~ </option>
-            <option value="voiture">Voiture</option>
-            <option value="moto">Moto</option>
-            <option value="vélo">Vélo</option>
-            <option value="quad">Quad</option>
-          </select>
+          <button class="dropdown-toggle">Type</button>
+          <div class="dropdown-options">
+            <label><input type="checkbox" value="voiture">Voiture</label>
+            <label><input type="checkbox" value="moto">Moto</label>
+            <label><input type="checkbox" value="vélo">Vélo</label>
+            <label><input type="checkbox" value="quad">Quad</label>
+          </div>
         </div>
 
         <div id="vehi-colour-field" class="sub-dropdown" style="display: none;">
-          <label class="label" for="vehi-colour-select">Couleur</label>
-          <select id="vehi-colour-select" class="input">
-            <option value=""> ~ </option>
-            <option value="rouge">Rouge</option>
-            <option value="noir">Noir</option>
-            <option value="gris">Gris</option>
-            <option value="brun">Brun</option>
-          </select>
+          <button class="dropdown-toggle">Couleur</button>
+          <div class="dropdown-options">
+            <label><input type="checkbox" value="rouge">Rouge</label>
+            <label><input type="checkbox" value="noir">Noir</label>
+            <label><input type="checkbox" value="gris">Gris</label>
+            <label><input type="checkbox" value="brun">Brun</label>
+          </div>
         </div>
 
       </div>
     </aside>
   </div>
-  
-  
+
+
   <div class="container">
     <section class="card">
       <header class="card-head">
@@ -131,32 +127,38 @@
 </main>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const categorySelect = document.getElementById('category-select');
-    
-    const mileageField = document.getElementById('vehi-mileage-field');
-    const brandField = document.getElementById('vehi-brand-field');
-    const typeField = document.getElementById('vehi-type-field');
-    const colourField = document.getElementById('vehi-colour-field');
+document.addEventListener('DOMContentLoaded', function() {
+  const categorySelect = document.getElementById('category-select');
 
-    // fonction pour afficher/cacher les sous-catégories en fonction de la catégorie sélectionnée
-    function toggleCat() {
-      if (categorySelect.value === 'Véhicule') {
-        mileageField.style.display = 'block';
-        brandField.style.display = 'block';
-        typeField.style.display = 'block';
-        colourField.style.display = 'block';
+  const subDropdowns = [
+    document.getElementById('vehi-mileage-field'),
+    document.getElementById('vehi-brand-field'),
+    document.getElementById('vehi-type-field'),
+    document.getElementById('vehi-colour-field')
+  ];
 
-      } else {
-        mileageField.style.display = 'none';
-        brandField.style.display = 'none';
-        typeField.style.display = 'none';
-        colourField.style.display = 'none';
-      }
+  // montre les dropdowns des sous-catégories en fonction de la catégorie principale sélectionnée
+  function toggleCat() {
+    if (categorySelect.value === 'Véhicule') {
+      subDropdowns.forEach(drop => drop.style.display = 'block');
+    } else {
+      subDropdowns.forEach(drop => {
+        drop.style.display = 'none';
+        drop.querySelector('.dropdown-options').style.display = 'none';
+      });
     }
+  }
 
-   toggleCat();
+  toggleCat();
+  categorySelect.addEventListener('change', toggleCat);
 
-    categorySelect.addEventListener('change', toggleCat);
+  // Gestion de l'affichage des options dans les sous-dropdowns
+  subDropdowns.forEach(drop => {
+    const btn = drop.querySelector('.dropdown-toggle');
+    const options = drop.querySelector('.dropdown-options');
+    btn.addEventListener('click', () => {
+      options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+    });
   });
+});
 </script>

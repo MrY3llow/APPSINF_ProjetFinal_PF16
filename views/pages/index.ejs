@@ -1,48 +1,162 @@
-<main class="container">
-    
-  <section class="card">
-    <header class="card-head">
-      <h1 class="card-title">Produits disponibles</h1>
-    </header>
+<main class="page-layout">
+  
+  <!-- Barre latérale gauche avec les filtres de recherche -->
+  <div class="left-space-wrapper">
+    <aside class="left-space">
+      
+      <!-- Barre d'input pour définir un prix min et max -->
+      <div class="toolbox-inputs">
+        <div class="field">
+          <label class="label" for="input1">Prix min</label>
+          <input type="text" id="input1" class="input" placeholder="min">
+        </div>
 
-  <div class="products-grid">
+        <div class="field">
+          <label class="label" for="input2">Prix max</label>
+          <input type="text" id="input2" class="input" placeholder="max">
+        </div>
 
-    <div class="card">
-      <h2 class="card-title">iPhone 0 promax</h2>
-      <p class="card-subtitle">État impeccable, 0 </p>
-      <p class="product-price">2099€</p>
-      <div class="actions">
-        <a class="btn-outline nav-link" href="#">Voir le produit</a>
+        <!-- Dropdown pour sélectionner une catégorie principale -->
+        <div class="field">
+          <label class="label" for="category-select">Catégories</label>
+          <select id="category-select" class="input">
+            <option value=""> ~ </option>
+            <option value="Véhicule">Véhicule</option>
+            <option value="Vêtements">Vêtemens</option>
+            <option value="Jouets">Jouets</option>
+            <option value="Meubles">Meubles</option>
+            <option value="Accessories">Accessoires</option>
+          </select>
+        </div>
+
+        <div class="separator"></div>
+        
+        <!-- Sous-catégories qui s'affichent uniquement si "Véhicule" est sélectionné -->
+        <div id="vehi-mileage-field" class="sub-dropdown" style="display: none;">
+          <label class="label" for="vehi-mileage-select">Kilométrage</label>
+          <select id="vehi-mileage-select" class="input">
+            <option value=""> ~ </option>
+            <option value="0-5000">0 - 5 000 km</option>
+            <option value="5000-20000">5 000 - 20 000 km</option>
+            <option value="20000-50000">20 000 - 50 000 km</option>
+            <option value="50000+">50 000 km+</option>
+          </select>
+        </div>
+
+        <div id="vehi-brand-field" class="sub-dropdown" style="display: none;">
+          <label class="label" for="vehi-brand-select">Marque</label>
+          <select id="vehi-brand-select" class="input">
+            <option value=""> ~ </option>
+            <option value="volvo">Volvo</option>
+            <option value="toyota">Toyota</option>
+            <option value="ferrari">Ferrari</option>
+            <option value="volkswagen">Volkswagen</option>
+          </select>
+        </div>
+
+        <div id="vehi-type-field" class="sub-dropdown" style="display: none;">
+          <label class="label" for="vehi-type-select">Type</label>
+          <select id="vehi-type-select" class="input">
+            <option value=""> ~ </option>
+            <option value="voiture">Voiture</option>
+            <option value="moto">Moto</option>
+            <option value="vélo">Vélo</option>
+            <option value="quad">Quad</option>
+          </select>
+        </div>
+
+        <div id="vehi-colour-field" class="sub-dropdown" style="display: none;">
+          <label class="label" for="vehi-colour-select">Couleur</label>
+          <select id="vehi-colour-select" class="input">
+            <option value=""> ~ </option>
+            <option value="rouge">Rouge</option>
+            <option value="noir">Noir</option>
+            <option value="gris">Gris</option>
+            <option value="brun">Brun</option>
+          </select>
+        </div>
+
       </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">iPhone 0 promax</h2>
-      <p class="card-subtitle">État impeccable, 0 </p>
-      <p class="product-price">2099€</p>
-      <div class="actions">
-        <a class="btn-outline nav-link" href="#">Voir le produit</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">iPhone 0 promax</h2>
-      <p class="card-subtitle">État impeccable, 0 </p>
-      <p class="product-price">2099€</p>
-      <div class="actions">
-        <a class="btn-outline nav-link" href="#">Voir le produit</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">iPhone 0 promax</h2>
-      <p class="card-subtitle">État impeccable, 0 </p>
-      <p class="product-price">2099€</p>
-      <div class="actions">
-        <a class="btn-outline nav-link" href="#">Voir le produit</a>
-      </div>
-    </div>
-
+    </aside>
   </div>
-  </section>
+  
+  
+  <div class="container">
+    <section class="card">
+      <header class="card-head">
+        <h1 class="card-title">Produits disponibles</h1>
+      </header>
+
+      <div class="products-grid">
+
+        <div class="card">
+          <h2 class="card-title">iPhone 0 promax</h2>
+          <p class="card-subtitle">État impeccable, 0 </p>
+          <p class="product-price">2099€</p>
+          <div class="actions">
+            <a class="btn-outline nav-link" href="#">Voir le produit</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">iPhone 0 promax</h2>
+          <p class="card-subtitle">État impeccable, 0 </p>
+          <p class="product-price">2099€</p>
+          <div class="actions">
+            <a class="btn-outline nav-link" href="#">Voir le produit</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">iPhone 0 promax</h2>
+          <p class="card-subtitle">État impeccable, 0 </p>
+          <p class="product-price">2099€</p>
+          <div class="actions">
+            <a class="btn-outline nav-link" href="#">Voir le produit</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">iPhone 0 promax</h2>
+          <p class="card-subtitle">État impeccable, 0 </p>
+          <p class="product-price">2099€</p>
+          <div class="actions">
+            <a class="btn-outline nav-link" href="#">Voir le produit</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
 </main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category-select');
+    
+    const mileageField = document.getElementById('vehi-mileage-field');
+    const brandField = document.getElementById('vehi-brand-field');
+    const typeField = document.getElementById('vehi-type-field');
+    const colourField = document.getElementById('vehi-colour-field');
+
+    // fonction pour afficher/cacher les sous-catégories en fonction de la catégorie sélectionnée
+    function toggleCat() {
+      if (categorySelect.value === 'Véhicule') {
+        mileageField.style.display = 'block';
+        brandField.style.display = 'block';
+        typeField.style.display = 'block';
+        colourField.style.display = 'block';
+
+      } else {
+        mileageField.style.display = 'none';
+        brandField.style.display = 'none';
+        typeField.style.display = 'none';
+        colourField.style.display = 'none';
+      }
+    }
+
+   toggleCat();
+
+    categorySelect.addEventListener('change', toggleCat);
+  });
+</script>

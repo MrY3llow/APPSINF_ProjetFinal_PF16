@@ -206,6 +206,15 @@ img{ max-width:100%; display:block; }
 }
 
 .card-head{ margin-bottom: 10px; }
+
+.card-head hr {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 1px;
+}
+
 .card-title{
   margin: 0 0 6px;
   font-size: 1.6rem; 
@@ -423,6 +432,14 @@ img{ max-width:100%; display:block; }
 .product-image {
   width: 100%;
   height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  background: var(--bg);
+}
+
+.productPage-image {
+  width: 100%;
   object-fit: cover;
   border-radius: 12px;
   margin-bottom: 16px;

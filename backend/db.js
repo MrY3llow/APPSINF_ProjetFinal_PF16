@@ -18,9 +18,8 @@ const sells = {
     "address",
     "image",
     "category",
-    "state",
     "date",
-    "data"
+    "filter"
   ],
 
 

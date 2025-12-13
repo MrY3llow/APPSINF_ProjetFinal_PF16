@@ -54,12 +54,6 @@
         <input id="quantity" type="number" name="quantity" class="input" placeholder="Quantité" value="<%= quantityInput %>" min="1" step="1">
       </div>
 
-      <!-- INPUT >   Etat -->
-      <div class="field">
-        <label for="state" class="label">État</label>
-        <input id="state" type="text" name="adresse" class="input" placeholder="État" value="<%= stateInput %>">
-      </div>
-
       <!-- SELECT >   Catégorie -->
       <div class="field">
         <label for="category" class="label">Catégorie</label>
@@ -67,26 +61,105 @@
           <% if (!categoryInput) { %>
             <option value="" disabled selected>Sélectionnez une catégorie</option>
           <% } %>
-          <% for(let category of categoryList) { %>
-            <% if (category[0] == categoryInput) { %>
-              <option value="<%= category[0] %>" selected><%= category[1] %></option>
+          <% for(let categoryName in categoryData) { %>
+            <% if (categoryName == categoryInput) { %>
+              <option value="<%= categoryName %>" selected><%= categoryName %></option>
             <% } else {  %>
-              <option value="<%= category[0] %>"><%= category[1] %></option>
+              <option value="<%= categoryName %>"><%= categoryName %></option>
             <% } %>
-              
           <% } %>
         </select>
       </div>
+
+      <!-- ZZone dynamique pour les filtres spécifiques -->
+      <div id="dynamic-fields"></div>
       
-      <!-- BUTTON >   ENvoyer le formulaire -->
+      <!-- BUTTON >   Envoyer le formulaire -->
       <div class="actions">
-        <button class="btn" type="submit">Publier votre annonce </button>
+        <button class="btn" type="submit">Publier votre annonce</button>
       </div>
 
     </form>
   </section>
 
   <script>
+    const categoryData = <%- JSON.stringify(categoryData) %>;
+
+    // Fonction pour créer les champs dynamiques
+    function updateDynamicFields(category) {
+      const container = document.getElementById('dynamic-fields');
+      container.innerHTML = ''; // Vider les champs précédents
+
+      // Si aucune catégorie n'est séléctionnée (ou que c'est une erreur),
+      // alors rien n'est affiché.
+      if (!category || !categoryData[category]) {
+        return;
+      }
+
+      
+      // Créer des inputs pour chaque filtre de la catégorie
+      categoryData[category].forEach(filter => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'field';
+
+        const label = document.createElement('label');
+        label.className = 'label';
+        label.textContent = filter.name;
+        
+        const fieldId = `filter_${filter.name}`
+        label.setAttribute('for', fieldId);
+
+
+        let input;
+
+        if (filter.type === 'select') { // Si l'input est une sélection de valeurs
+          input = document.createElement('select');
+          input.className = 'input';
+          input.id = fieldId;
+          input.name = `filter[${filter.name}]`;
+
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = `Sélectionnez ${filter.name.toLowerCase()}`;
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          input.appendChild(defaultOption);
+
+          filter.values.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            input.appendChild(option);
+          });
+
+        } else if (filter.type === 'number') {
+          input = document.createElement('input');
+          input.type = 'number';
+          input.className = 'input';
+          input.id = fieldId;
+          input.name = `filter[${filter.name}]`;
+          input.placeholder = filter.name;
+          input.min = '0';
+        }
+
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        container.appendChild(fieldDiv);
+      });
+    }
+
+    // Écouteur d'événement sur le changement de catégorie
+    document.getElementById('category').addEventListener('change', function(e) {
+      updateDynamicFields(e.target.value);
+    });
+
+    // Initialiser les champs si une catégorie est déjà sélectionnée
+    const selectedCategory = document.getElementById('category').value;
+    if (selectedCategory) {
+      updateDynamicFields(selectedCategory);
+    }
+
+    // Gestion de l'aperçu d'image
     document.getElementById('image').addEventListener('change', function(e) {
       const file = e.target.files[0];
       const preview = document.getElementById('preview');

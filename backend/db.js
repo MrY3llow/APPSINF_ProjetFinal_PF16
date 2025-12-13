@@ -1,5 +1,7 @@
 const utils = require('./utils.js');
 const { documentSearch } = require('./document-search.js');
+const ObjectId = require('mongodb').ObjectId;
+
 
 
 //   +-----------+
@@ -119,6 +121,48 @@ const sells = {
     return await dbo.collection('sells')
       .find()
       .toArray();
+  },
+
+  /**
+   * Vérifie qu'une vente peut être achetée.
+   * Conditions :
+   * - la quantité doit être supérieure à 1
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {Object} id - L'id de la vente
+   * @throws {Error} Si la requête à la base de données échoue
+   */
+  isPurchasable : async function (dbo, id) {
+    try {
+      console.log(id)
+      sell = await dbo.collection('sells').findOne({ _id: id });
+      return (sell.quantity > 0);
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  /**
+   * Réalise l'achat d'une vente d'un utilisateur.
+   * La quantité disponible diminue de 1.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {Object} id - L'id de la vente
+   * @param {string} username - le nom de l'utilisateur qui achète.
+   * @throws {Error} Si la requête à la base de données échoue
+   */
+  buy : async function (dbo, id, username) {
+    if (this.isPurchasable(dbo, id)) {
+      await dbo.collection('sells').updateOne(
+        { _id: id }, 
+        { 
+          $inc: { quantity: -1 },
+          $push: { buyers: { username: username } }
+        }
+      );
+    } else {
+      throw new Error(`La vente n'est pas achetable.`);
+    }
   },
 
 

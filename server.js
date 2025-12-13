@@ -14,6 +14,7 @@ const db = require('./backend/db.js');
 const utils = require('./backend/utils.js');
 const filter = require('./backend/filter.js');
 const multer = require('multer'); // Permet de gérer les upload d'iamge
+const { error } = require('console');
 const ObjectId = require('mongodb').ObjectId;
 
 MongoClient = require('mongodb').MongoClient;
@@ -392,11 +393,40 @@ async function main() {
       const sell = await dbo.collection('sells').findOne({ _id: new ObjectId(sellId) });
 
       res.render("layout", {
-        title: "Moddification d'une vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
+        title: "Vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
         page: "pages/product-page",
         username: req.session.username,
         sell: sell,
+        error: null,
       })
+    });
+
+    // Post BUY PRODUCT
+    app.post('/sell/:id/buy', (req, res) => {
+      const sellId = req.params.id;
+      const username = req.session.username;
+      console.log(username);
+
+      try {
+        db.sells.buy(dbo, new ObjectId(sellId), username)
+      } catch (err) {
+        let error = "";
+        if (err.message == "La vente n'est pas achetable.") {
+          error += "Vous ne pouvez pas acheter ceci.\n";
+        } else {
+          error += "Une erreur est survenue avec la base de donnée.\n";
+        }
+        res.render("layout", {
+          title: "Vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
+          page: "pages/product-page",
+          username: req.session.username,
+          sell: sell,
+          error: error,
+        })
+        return;
+      }
+      res.redirect('/purchase-history');
+
     });
 
 

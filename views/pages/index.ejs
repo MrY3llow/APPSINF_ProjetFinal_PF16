@@ -8,19 +8,20 @@
     <div class="products-grid">
 
       <!-- Carte pour une vente -->
-      <% for (let sell of sells) { %>
+      <% for (let sell of sells) { if (sell.quantity > 0) { %>
         <div class="card">
           <% if (sell.image) { %>
             <img src="/image/sell/<%= sell._id %>" alt="<%= sell.title %>" class="product-image">
           <% } %>
           <h2 class="card-title"><%= sell.title %></h2>
           <p class="card-subtitle"><%= sell.description %></p>
+          <p class="card-subtitle">Encore <%= sell.quantity %> en stock • Vendu par <%= sell.owner %></p>
           <p class="product-price"><%= sell.price %> €</p>
           <div class="actions">
             <a class="btn-outline nav-link" href="/product/<%= sell._id %>">Voir le produit</a>
           </div>
         </div>
-      <% } %>
+      <% } } %>
 
       <!-- Si aucune vente -->
       <% if (sells.length == 0) { %>

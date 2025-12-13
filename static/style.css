@@ -179,6 +179,10 @@ img{ max-width:100%; display:block; }
   font-weight: 700;
   box-shadow: var(--shadow);
   cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.btn:hover {
+  opacity: 0.9;
 }
 .btn-outline{
   background: transparent;
@@ -195,6 +199,19 @@ img{ max-width:100%; display:block; }
   cursor: pointer;
 }
 .btn-ghost:hover{ color: var(--text); }
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--primary);
+}
+
+.btn:disabled:hover,
+.btn[disabled]:hover {
+  opacity: 0.5;
+  background: var(--primary);
+}
 
 .card{
   background: var(--surface);
@@ -453,4 +470,8 @@ img{ max-width:100%; display:block; }
 
 .product-price {
   margin-top: auto;
+}
+
+.product-not-available-text {
+  color: #d32f2f;
 }

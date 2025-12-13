@@ -18,9 +18,8 @@ const sells = {
     "address",
     "image",
     "category",
-    "state",
     "date",
-    "data"
+    "filter"
   ],
 
 
@@ -61,7 +60,7 @@ const sells = {
    * @param {string} [options.title=null] - Le titre de la vente
    * @param {string} [options.description=null] - La description de la vente
    * @param {string} [options.owner=null] - Le propriétaire de la vente
-   * @param {Array<number|string>} [options.price=null] - Le prix au format [montant, devise]
+   * @param {number} [options.price=null] - Le prix en €
    * @param {number} [options.quantity=null] - La quantité disponible
    * @param {string} [options.location=null] - La localisation
    * @param {string} [options.image=null] - L'URL de l'image
@@ -73,12 +72,16 @@ const sells = {
    * await db.sells.create(dbo, {
    *   title: "Vélo",
    *   owner: "John",
-   *   price: [150, "EUR"],
+   *   price: 150,
    *   quantity: 1
    * });
    */
   create : async function(dbo, options) {
     this.checkSellsOptions(options);
+
+    // Convertis les nombres de String en Number
+    options.price = Number(options.price);
+    options.quantity = Number(options.quantity);
     await dbo.collection('sells').insertOne(options);
   },
 

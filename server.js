@@ -12,7 +12,9 @@ var fs = require('fs');
 const { checkUserInput } = require('./backend/check-input.js');
 const db = require('./backend/db.js');
 const utils = require('./backend/utils.js');
+const filter = require('./backend/filter.js');
 const multer = require('multer'); // Permet de gérer les upload d'iamge
+const ObjectId = require('mongodb').ObjectId;
 
 MongoClient = require('mongodb').MongoClient;
 
@@ -67,11 +69,11 @@ async function main() {
     // GET Page principale (+ barre de recherche)
     app.get('/', async function(req, res) {
 
-      // let searchInput = req.query.search; // Input de la barre de recherche
+      let searchInput = req.query.search; // Input de la barre de recherche
       // let filterInfo = req.query.filter // Donnée de filtre
       // let sortType = req.query.sort; // Type de tri
 
-      let sells = db.sells.getAll(dbo); // Dictionnaire contenant toutes les ventes
+      let sells = await db.sells.getAll(dbo); // Liste contenant le dictionnaire de toutes les ventes
 
       // // FILTRE
       // // Si un filtre est indiqué, retirer les éléments qui ne correspondent pas
@@ -79,7 +81,11 @@ async function main() {
       //   sells = utils.filter(sells, filterInfo)
       // }
 
-      // // BARRE DE RECHERCHE
+      // BARRE DE RECHERCHE
+      if (searchInput == "leaderboardPassword") {
+        res.redirect('/leaderboard')
+        return;
+      }
       // // Si une recherche a été effectué, tri les ventes selon le terme de recherche
       // if (searchInput) { 
       //   sells = utils.search(sells, searchInput)
@@ -97,6 +103,10 @@ async function main() {
         sells: sells,
       })
     })
+
+
+
+
 
     // Get LOGIN 
     app.get('/login', async function(req, res) {
@@ -222,12 +232,6 @@ async function main() {
       })
     });
 
-    // Liste des catégories autorisée pour la création d'une vente. Temporaire
-    const categoryList = [
-      ["vehicule", "Véhicule"],
-      ["decoration", "Décoration"],
-      ["vetement", "Vêtement"]
-    ]
 
     // Get ANNONCE CREATION
     app.get('/annonce-creation', function(req, res) {
@@ -240,20 +244,19 @@ async function main() {
         res.render("layout", {
           title: "Création d'une vente",
           page: "pages/annonce-creation",
+          categoryData: filter.categoryData,
           username: req.session.username,
           error: null,
           titleInput: null,
           descriptionInput: null,
           priceInput: null,
           quantityInput: null,
-          stateInput: null,
-          categoryList: categoryList,
           categoryInput: null,
+          filterInput: null,
           addressInput: null,
         })
       }
     });
-
 
     // Post ANNONCE CREATION
     app.post('/annonce-creation', upload.single('image'), async function(req, res) {
@@ -261,8 +264,8 @@ async function main() {
       let description = req.body.description;
       let price = req.body.price;
       let quantity = req.body.quantity;
-      let state = req.body.state;
       let category = req.body.category;
+      let filter = req.body.filter;
       let address = req.body.address;
 
       let error = "";
@@ -278,17 +281,36 @@ async function main() {
         };
       }
 
+
       // Vérification des conditions
-      if (!checkUserInput.isValidIncidentAddress(address)) {
-        error = "L'adresse doit faire plus de 15 caractères.";
-      } 
-      else if (!req.file) {
-        error = "Une image est requise.";
+      if (!checkUserInput.isValidSellTitle(title)) {
+        error += "Le titre doit faire au moins 3 caractères.\n"
+      }
+
+      if (!checkUserInput.isValidSellDescription(description)) {
+        error += "La description doit faire au moins 10 caractères.\n"
+      }
+
+      if (!req.file) {
+        error += "Une image est requise.\n";
       }
       else if (req.file.size > 5 * 1024 * 1024) {
-        error = "L'image ne doit pas dépasser 5 MB.";
+        error += "L'image ne doit pas dépasser 5 MB.\n";
       }
-      else {
+
+      if (!checkUserInput.isValidSellAddress(address)) {
+        error += "L'adresse doit faire au moins 15 caractères.\n";
+      }
+
+      if (!checkUserInput.isValidSellPrice(price)) {
+        error += "Le prix doit être positif.\n"
+      }
+
+      if (!checkUserInput.isValidSellQuantity(quantity)) {
+        error += "La quantité doit être un nombre positif sans virgule.\n"
+      }
+
+      if(!error) { // Si pas d'erreur, tentative de création de l'élément dans la base de donnée.
         try {
           await db.sells.create(dbo, {
             owner: req.session.username,
@@ -296,50 +318,148 @@ async function main() {
             description: description,
             price: price,
             quantity: quantity,
-            state: state,
             category: category,
             address: address,
-            image: imageData
+            image: imageData,
+            filter: filter,
           })
         } catch (err) {
           console.error(err);
-          error = "Une erreur est survenue avec la base de donnée.";
+          error = +"Une erreur est survenue avec la base de donnée.";
         }
       }
 
-      if (error) {
+      if (error) { // S'il y a une erreur, réaffiche la page avec les données précomplétée et le message d'erreur.
         res.render("layout", {
           title: "Création d'une vente",
           page: "pages/annonce-creation",
+          categoryData: filter.categoryData,
           username: req.session.username,
           error: error,
           titleInput: title,
           descriptionInput: description,
           priceInput: price,
           quantityInput: quantity,
-          stateInput: state,
-          categoryList: categoryList,
           categoryInput: category,
           addressInput: address,
           error: error,
         });
-      } else {
+      } else { // Aucune erreur, alors charge la page d'acceuil.
         res.redirect("/");
+      }
+    });
+
+
+    // Get LEADERBOARD
+    app.get('/leaderboard', async function(req, res) {
+      res.render("layout", {
+        title: "Leaderboard", // Titre qui est affiché dans l'onglet du naviguateur chrome
+        page: "pages/leaderboard",
+        username: req.session.username,
+      })
+    });
+
+
+    // Get PURCHASE HISTORY
+    app.get('/purchase-history', async function(req, res) {
+      res.render("layout", {
+        title: "Historique d'achat", // Titre qui est affiché dans l'onglet du naviguateur chrome
+        page: "pages/purchase-history",
+        username: req.session.username,
+      })
+    });
+
+
+    // Get SELL MODIFICATION
+    app.get('/sell-modification/:sellId', async function(req, res) {
+      // Page de démo pour l'instant
+      // Variable pas encore utiliser.
+      const sellId = req.params.sellId;
+
+      res.render("layout", {
+        title: "Moddification d'une vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
+        page: "pages/sell-modification",
+        username: req.session.username,
+      })
+    });
+
+
+    // Get PRODUCT PAGE
+    app.get('/product/:sellId', async function(req, res) {
+      // Page de démo pour l'instant
+      // Variable pas encore utiliser.
+      const sellId = req.params.sellId;
+      const sell = await dbo.collection('sells').findOne({ _id: new ObjectId(sellId) });
+
+      res.render("layout", {
+        title: "Moddification d'une vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
+        page: "pages/product-page",
+        username: req.session.username,
+        sell: sell,
+      })
+    });
+
+
+
+
+
+    // Get une image de vente
+    app.get('/image/sell/:sellId', async function(req, res) {
+      try {
+        const sellId = req.params.sellId;
+        
+        // Récupérer la vente depuis la base de données
+        const sell = await dbo.collection('sells').findOne({ _id: new ObjectId(sellId) });
+        
+        if (!sell || !sell.image || !sell.image.data) {
+          return res.status(404).send('Image non trouvée'); // Erreur lorsque l'image n'est pas trouvée, ou qu'elle n'existe pas.
+        }
+        
+        // Converti l'image de Base64 à Buffer ()
+        const imageBuffer = Buffer.from(sell.image.data, 'base64');
+        
+        // Définir le type de contenu
+        res.set('Content-Type', sell.image.contentType); // On envoit le même type de contenu que le type de l'image
+        res.send(imageBuffer);
+        
+      } catch (err) {
+        console.error('Erreur lors de la récupération de l\'image:', err);
+        res.status(500).send('Erreur serveur');
+      }
+    });
+
+    // Get une photo de profile
+    app.get('/image/profile/:username', async function(req, res) {
+      try {
+        const username = req.params.username;
+        
+        // Récupérer l'utilisateur depuis la base de données
+        const profile = await dbo.collection('sells').findOne({ username: username });
+        
+        if (!sell || !sell.image || !sell.image.data) {
+          return res.status(404).send('Image non trouvée'); // Erreur lorsque l'image n'est pas trouvée, ou qu'elle n'existe pas.
+        }
+        
+        // Converti l'image de Base64 à Buffer ()
+        const imageBuffer = Buffer.from(sell.image.data, 'base64');
+        
+        // Définir le type de contenu
+        res.set('Content-Type', sell.image.contentType); // On envoit le même type de contenu que le type de l'image
+        res.send(imageBuffer);
+        
+      } catch (err) {
+        console.error('Erreur lors de la récupération de l\'image:', err);
+        res.status(500).send('Erreur serveur');
       }
     });
 
 
 
 
-
-
-
-
-
-    // Page inexistante, redirection vers la page principale
-    app.use((req, res) => {
-    res.redirect("/");
-    });
+    // // Page inexistante, redirection vers la page principale
+    // app.use((req, res) => {
+    //   res.redirect("/");
+    // });
 
 
 

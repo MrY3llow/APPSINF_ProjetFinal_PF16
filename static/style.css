@@ -352,8 +352,12 @@ img{ max-width:100%; display:block; }
   background: rgba(0,0,0,0.08);
  
 }
+
+
 .rating {
   display: flex;
+  flex-direction: row-reverse; /* Inverse l'affichage visuel */
+  justify-content: flex-end; /* Aligne à gauche */
   gap: 5px;
   font-size: 25px;
 }
@@ -567,6 +571,7 @@ img{ max-width:100%; display:block; }
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
+}
 /* Image of products */
 
 .product-image {

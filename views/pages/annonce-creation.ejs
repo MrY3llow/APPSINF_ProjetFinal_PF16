@@ -99,14 +99,7 @@
         const label = document.createElement('label');
         label.className = 'label';
         
-        // Ajout de l'étoile rouge pour les champs obligatoires
-        const requiredSpan = document.createElement('span');
-        requiredSpan.className = 'required';
-        requiredSpan.textContent = '*';
-        
-        label.textContent = filter.name + ' ';
-        label.appendChild(requiredSpan);
-        
+        label.textContent = filter.name;
         const fieldId = `filter_${filter.name}`;
         label.setAttribute('for', fieldId);
 
@@ -118,7 +111,6 @@
           input.className = 'input';
           input.id = fieldId;
           input.name = `filter[${filter.name}]`;
-          input.required = true;
 
           const defaultOption = document.createElement('option');
           defaultOption.value = '';
@@ -142,7 +134,6 @@
           input.name = `filter[${filter.name}]`;
           input.placeholder = filter.name;
           input.min = '0';
-          input.required = true;
         }
 
         fieldDiv.appendChild(label);

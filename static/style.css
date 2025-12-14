@@ -1,5 +1,3 @@
-/* Lamine */
-
 :root{
   --bg: #f6f7fb;
   --surface: #ffffff;
@@ -51,6 +49,7 @@ img{ max-width:100%; display:block; }
   width: 92vw;
   margin: 0 auto;
   padding: 0 16px;
+  padding-bottom: 40px;
 }
 
 
@@ -67,11 +66,18 @@ img{ max-width:100%; display:block; }
   align-items: center;
   justify-content: space-between;
   gap: var(--gap);
-  padding: 14px 0;
+  padding: 10px 0;
 }
 
 .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; }
-.brand-logo{ width:44px; height:44px; object-fit:contain; }
+.brand-logo{ 
+  width:100px; 
+  height:50px; 
+  object-fit:cover; 
+  border: 1.5px solid var(--text); 
+  border-radius: 4px; 
+  background-color: #e6e9ee; 
+}
 .brand-title{
   font-size: 1.4rem;     
   font-weight: 800;
@@ -179,6 +185,11 @@ img{ max-width:100%; display:block; }
   color: var(--primary-contrast);
   font-weight: 700;
   box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.btn:hover {
+  opacity: 0.9;
 }
 .btn-outline{
   background: transparent;
@@ -196,6 +207,19 @@ img{ max-width:100%; display:block; }
 }
 .btn-ghost:hover{ color: var(--text); }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--primary);
+}
+
+.btn:disabled:hover,
+.btn[disabled]:hover {
+  opacity: 0.5;
+  background: var(--primary);
+}
+
 .card{
   background: var(--surface);
   border: 1px solid var(--border);
@@ -206,6 +230,15 @@ img{ max-width:100%; display:block; }
 }
 
 .card-head{ margin-bottom: 10px; }
+
+.card-head hr {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 1px;
+}
+
 .card-title{
   margin: 0 0 6px;
   font-size: 1.6rem; 
@@ -534,4 +567,34 @@ img{ max-width:100%; display:block; }
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
+/* Image of products */
+
+.product-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  background: var(--bg);
+}
+
+.productPage-image {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  background: var(--bg);
+}
+
+.products-grid .card {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-price {
+  margin-top: auto;
+}
+
+.product-not-available-text {
+  color: #d32f2f;
 }

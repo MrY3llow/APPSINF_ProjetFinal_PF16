@@ -585,6 +585,8 @@ img{ max-width:100%; display:block; }
 
 .productPage-image {
   width: 100%;
+  max-width: 27vw;
+  height: auto;
   object-fit: cover;
   border-radius: 12px;
   margin-bottom: 16px;

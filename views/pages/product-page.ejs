@@ -11,9 +11,35 @@
       <img src="/image/sell/<%= sell._id %>" alt="<%= sell.title %>" class="productPage-image">
     <% } %>
     <h2 class="card-title"><%= sell.title %></h2>
-    <p class="card-subtitle"><%= sell.description %></p>
-    <p class="card-subtitle">Encore <%= sell.quantity %> en stock</p>
-    <p class="product-price"><%= sell.price %> €</p>
+    <p class="card-subtitle">Description : <%= sell.description %></p>    
+
+    <% if (sell.filter && typeof sell.filter === 'object') { %>
+      <%
+        let entries = Object.entries(sell.filter);
+        entries = entries.filter(([key,value]) => value !== undefined && value !== null);
+
+        if (sell.category === 'Véhicule') {
+          for (let i=0; i<entries.length; i+=1) {
+            if (entries[i][0] == 'Nombre de roue') {
+              entries[i][1] += ' roues';
+            } else if (entries[i][0] == 'KilomÃ©trage') {
+              entries[i][1] += ' km';
+            } else if (entries[i][0] == 'AnnÃ©e') {
+              entries[i][1] = 'Années : ' + entries[i][1];
+            }
+          }
+        }
+      %>
+      <p class="card-subtitle">
+        Filtres : <%= sell.category %> , <%= entries.map(e => e[1]).join(', ') %>
+      </p>
+    <% } %>
+
+
+    
+    <p class="card-subtitle">Stock : <%= sell.quantity %></p>
+    <p class="product-price"><%= sell.price %> €</p>    
+
 
     <!-- BUTTON >   Acheter -->
     <div class="actions">

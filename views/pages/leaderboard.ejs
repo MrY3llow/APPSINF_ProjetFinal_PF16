@@ -21,32 +21,19 @@
         </thead>
 
         <tbody>
-          <tr>
-            <td>#1</td>
-            <td style="text-align: center;">
-              <img src="pdp.png" class="profile-photo"><br>
-                Sergio
-              </td>
-            <td>5</td>
-          </tr>
-
-          <tr>
-            <td>#2</td>
-            <td style="text-align: center;">
-              <img src="pdp.png" class="profile-photo"><br>
-                Charle
-              </td>
-            <td>4</td>
-          </tr>
-
-          <tr>
-            <td>#3</td>
-            <td style="text-align: center;">
-              <img src="pdp.png" class="profile-photo"><br>
-                Pecheur
-              </td>
-            <td>2</td>
-          </tr>
+          <%
+          compteur = 0
+          for (let user of leaderboard) {
+            compteur++; %>
+            <tr>
+              <td>#<%= compteur %></td>
+              <td style="text-align: center;">
+                <img src="/image/user/<%= user.username %>" class="profile-photo"><br>
+                  <%= user.username %>
+                </td>
+              <td><%= user.points %></td>
+            </tr>
+          <% } %>
         </tbody>
       </table>
     </div>

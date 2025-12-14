@@ -302,11 +302,33 @@ const user = {
   },
 
   
+  /**
+   * Change la photo de l'utilisateur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   * @param {Object} photo - La photo à stocker dans la base de donnée.
+   */
   changeUserPhoto(dbo, username, photo) {
     dbo.collection('users').updateOne(
       { username: username },
       { $set: { photo: photo } }
-    );
+    )
+  },
+
+
+  /**
+   * Moddifie le montant des fonds de l'utilisateur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   * @param {number} amount - Le montant (positif ou négatif) à ajouter a la valeur actuelle.
+   */
+  addBalance(dbo, username, amount) {
+    dbo.collection('users').updateOne(
+      { username: username },
+      { $inc: { balance: amount } }
+    )
   }
 
 }

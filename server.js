@@ -245,48 +245,61 @@ async function main() {
       }
     });
 
-// POST pour mettre à jour la photo de profile
-app.post('/profile/updateImage', upload.single('image'), async function(req, res) {
-  // Vérifier si l'utilisateur est connecté
-  if (!req.session.username) {
-    return res.status(401).json({ error: "Non authentifié" });
-  }
+    // POST pour mettre à jour la photo de profile
+    app.post('/profile/updateImage', upload.single('image'), async function(req, res) {
+      // Vérifier si l'utilisateur est connecté
+      if (!req.session.username) {
+        return res.status(401).json({ error: "Non authentifié" });
+      }
 
-  let error = "";
+      let error = "";
 
-  // Récupérer l'image uploadée
-  let imageData = null;
-  if (req.file) {
-    imageData = {
-      contentType: req.file.mimetype, // 'image/jpeg', 'image/png', etc.
-      data: req.file.buffer.toString('base64'), // Conversion en Base64
-      size: req.file.size,
-      filename: req.file.originalname
-    };
-  }
+      // Récupérer l'image uploadée
+      let imageData = null;
+      if (req.file) {
+        imageData = {
+          contentType: req.file.mimetype, // 'image/jpeg', 'image/png', etc.
+          data: req.file.buffer.toString('base64'), // Conversion en Base64
+          size: req.file.size,
+          filename: req.file.originalname
+        };
+      }
 
-  // Vérification des conditions
-  if (!req.file) {
-    error += "Une image est requise.\n";
-  }
-  else if (req.file.size > 5 * 1024 * 1024) {
-    error += "L'image ne doit pas dépasser 5 MB.\n";
-  }
+      // Vérification des conditions
+      if (!req.file) {
+        error += "Une image est requise.\n";
+      }
+      else if (req.file.size > 5 * 1024 * 1024) {
+        error += "L'image ne doit pas dépasser 5 MB.\n";
+      }
 
-  if (error) {
-    return res.status(400).json({ error: error });
-  }
+      if (error) {
+        return res.status(400).json({ error: error });
+      }
 
-  // Mettre à jour la photo de profil dans la base de données
-  try {
-    db.user.changeUserPhoto(dbo, req.session.username, imageData);
-    
-    res.json({ success: true, message: "Photo de profil mise à jour avec succès" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Une erreur est survenue avec la base de données" });
-  }
-});
+      // Mettre à jour la photo de profil dans la base de données
+      try {
+        db.user.changeUserPhoto(dbo, req.session.username, imageData);
+        
+        res.json({ success: true, message: "Photo de profil mise à jour avec succès" });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Une erreur est survenue avec la base de données" });
+      }
+    });
+
+
+    // Post Ajout de fonds
+    app.post('/profile/addBalance/:value', async function(req, res) {
+      // Vérifier si l'utilisateur est connecté
+      if (!req.session.username) {
+        return res.status(401).json({ error: "Non authentifié" });
+      }
+
+      let amount = Number(req.params.value);
+      db.user.addBalance(dbo, req.session.username, amount);
+      res.redirect('/profile');
+    });
 
 
     // Get ANNONCE CREATION
@@ -547,7 +560,7 @@ app.post('/profile/updateImage', upload.single('image'), async function(req, res
         if (!profile) { 
           return res.status(404).send('Image non trouvée'); 
         }
-        
+
         // Si l'utilisateur n'a pas d'image, retourner l'image par défaut
         else if (!profile.photo || !profile.photo.data) {
           return res.sendFile(path.join(__dirname, 'static', 'defaultUserProfile.png'));

@@ -14,25 +14,14 @@
     <p class="card-subtitle"><%= sell.description %></p>
     <p class="card-subtitle">Encore <%= sell.quantity %> en stock</p>
     <p class="product-price"><%= sell.price %> €</p>
-    <div class="rating">
-      <input type="radio" id="star5" name="rating" value="1" />
-      <label for="star5">★</label>
-      <input type="radio" id="star4" name="rating" value="2" />
-      <label for="star4">★</label>
-      <input type="radio" id="star3" name="rating" value="3" />
-      <label for="star3">★</label>
-      <input type="radio" id="star2" name="rating" value="4" />
-      <label for="star2">★</label>
-      <input type="radio" id="star1" name="rating" value="5" />
-      <label for="star1">★</label>
-    </div>
 
     <!-- BUTTON >   Acheter -->
     <div class="actions">
       <%
       productNotAvailableText = "";
       if (sell.quantity <= 0) { productNotAvailableText += "Le produit n'est plus en stock.\n" }
-      else if (!username) { productNotAvailableText += "Connectez vous pour acheter.\n" } %>
+      else if (!username) { productNotAvailableText += "Connectez vous pour acheter.\n" } 
+      else if (username == sell.owner) { productNotAvailableText += "Vous ne pouvez pas acheter votre propre produit.\n" }%>
 
       <% if (productNotAvailableText) {%>
         <button class="btn" type="submit" disabled>Acheter le produit</button>

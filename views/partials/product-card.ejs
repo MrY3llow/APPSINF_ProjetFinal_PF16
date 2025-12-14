@@ -1,0 +1,52 @@
+<% if (typeof origin == undefined) {var origin = "index" }%>
+
+<div class="card">
+  <% if (sell.image) { %>
+    <img src="/image/sell/<%= sell._id %>" alt="<%= sell.title %>" class="product-image">
+  <% } %>
+  <h2 class="card-title"><%= sell.title %></h2>
+  <p class="card-subtitle"><%= sell.description %></p>
+    <%if (origin == "purchase-history") { %>
+      <p class="card-subtitle">• Vendu par <%= sell.owner %></p>
+    <% } else { %>
+      <p class="card-subtitle">Encore <%= sell.quantity%> en stock • Vendu par <%= sell.owner %></p>
+    <% } %>
+
+  <p class="product-price"><%= sell.price %> €</p>
+  <div class="actions">
+    <a class="btn-outline nav-link" href="/product/<%= sell._id %>">Voir le produit</a>
+      <% if (origin == "purchase-history") { %>
+        <form id="rating-form-<%= sell._id %>" method="POST" style="display: inline;">
+          <div class="rating">
+            <input type="radio" id="star1-<%= sell._id %>" name="rating" value="5" onchange="submitRating('<%= sell._id %>', 5)" />
+            <label for="star1-<%= sell._id %>">★</label>
+            <input type="radio" id="star2-<%= sell._id %>" name="rating" value="4" onchange="submitRating('<%= sell._id %>', 4)" />
+            <label for="star2-<%= sell._id %>">★</label>
+            <input type="radio" id="star3-<%= sell._id %>" name="rating" value="3" onchange="submitRating('<%= sell._id %>', 3)" />
+            <label for="star3-<%= sell._id %>">★</label>
+            <input type="radio" id="star4-<%= sell._id %>" name="rating" value="2" onchange="submitRating('<%= sell._id %>', 2)" />
+            <label for="star4-<%= sell._id %>">★</label>
+            <input type="radio" id="star5-<%= sell._id %>" name="rating" value="1" onchange="submitRating('<%= sell._id %>', 1)" />
+            <label for="star5-<%= sell._id %>">★</label>
+          </div>
+        </form>
+      <% } %>
+  </div>
+</div>
+
+<% if (origin == "purchase-history") { %>
+  <script>
+    /**
+     * Soumet le rating d'une vente via la route '/rating/:sellId/:rating'.
+     * @ param {number} sellId - L'id de la vente
+     * @ param {number} rating - Le rating entre 1 et 5.
+    */
+    function submitRating(sellId, rating) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `/rating/${sellId}/${rating}`;
+      document.body.appendChild(form);
+      form.submit();
+    }
+  </script>
+<% } %>

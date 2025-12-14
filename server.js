@@ -106,7 +106,11 @@ async function main() {
     })
 
 
-
+    // Get LOGOUT
+    app.get('/logout', function(req, res) {
+      req.session.username = undefined;
+      res.redirect('/');
+    });
 
 
     // Get LOGIN 
@@ -363,10 +367,12 @@ async function main() {
 
     // Get PURCHASE HISTORY
     app.get('/purchase-history', async function(req, res) {
+      const sells = await db.user.getSellHistory(dbo, req.session.username);
       res.render("layout", {
         title: "Historique d'achat", // Titre qui est affiché dans l'onglet du naviguateur chrome
         page: "pages/purchase-history",
         username: req.session.username,
+        sells: sells,
       })
     });
 
@@ -405,7 +411,6 @@ async function main() {
     app.post('/sell/:id/buy', (req, res) => {
       const sellId = req.params.id;
       const username = req.session.username;
-      console.log(username);
 
       try {
         db.sells.buy(dbo, new ObjectId(sellId), username)
@@ -431,6 +436,22 @@ async function main() {
 
 
 
+    
+
+    // Post RATE PRODUCT
+    app.post('/rating/:id/:rating', (req, res) => {
+      const sellId = req.params.id;
+      const rating = req.params.rating;
+      const username = req.session.username;
+
+      try {
+        db.sells.rate(dbo, new ObjectId(sellId), username, rating)
+      } catch (err) {
+        console.error(err);
+      }
+      res.redirect('/purchase-history');
+
+    });
 
 
     // Get une image de vente

@@ -157,14 +157,13 @@ const sells = {
         { _id: id }, 
         { 
           $inc: { quantity: -1 },
-          $push: { buyers: { username: username } }
+          $push: { buyers: { username: username, date: new Date() } }
         }
       );
     } else {
       throw new Error(`La vente n'est pas achetable.`);
     }
   },
-
 
 
 }
@@ -274,7 +273,23 @@ const user = {
       username: username
     })
     return result.fullname;
-  }
+  },
+
+  /**
+   * Retourne la listes des ventes que l'utilisateur à acheter, dans l'ordre de leur achat.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   */
+  getSellHistory : async function(dbo, username) {
+    let sells = await dbo.collection('sells')
+      .find({
+        buyers: { $elemMatch: { username: username } }
+      })
+      .sort({ 'buyers.date': -1 })
+      .toArray();
+    return sells;
+  },
 
 }
 

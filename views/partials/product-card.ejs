@@ -35,13 +35,18 @@
 </div>
 
 <% if (origin == "purchase-history") { %>
-<script>
-  function submitRating(sellId, rating) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/rating/${sellId}/${rating}`;
-    document.body.appendChild(form);
-    form.submit();
-  }
-</script>
+  <script>
+    /**
+     * Soumet le rating d'une vente via la route '/rating/:sellId/:rating'.
+     * @ param {number} sellId - L'id de la vente
+     * @ param {number} rating - Le rating entre 1 et 5.
+    */
+    function submitRating(sellId, rating) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `/rating/${sellId}/${rating}`;
+      document.body.appendChild(form);
+      form.submit();
+    }
+  </script>
 <% } %>

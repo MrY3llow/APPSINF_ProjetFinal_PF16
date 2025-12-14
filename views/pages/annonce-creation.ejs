@@ -175,6 +175,17 @@
         preview.classList.remove('show');
       }
     });
-  </script>
 
+    // code pour empêcher la sélection de plusieurs options simultanément
+    options.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          options.querySelectorAll('input[type="checkbox"]').forEach(other => {
+            if (other !== cb) other.checked = false;
+          });
+        }
+      });
+    });
+  });
+</script>
 </main>

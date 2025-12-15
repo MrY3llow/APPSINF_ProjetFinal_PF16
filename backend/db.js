@@ -380,6 +380,34 @@ const user = {
     );
   },
 
+  /**
+  * Calcule la moyenne des notes reçues en tant que vendeur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   */
+  getReviewAverage = async function (dbo, username) {
+    const sells = await dbo.collection('sells').find({owner: username, buyers: { $exists: true, $ne: [] }}).toArray();
+  
+    let total = 0;
+    let count = 0;
+  
+    for (const sell of sells) {
+      for (const buyer of sell.buyers) {
+        if (buyer.rating !== 'null') {
+          total += Number(buyer.rating);
+          count += 1;
+        }
+      }
+    }
+  
+    if (count === 0) {
+      return null;
+    }
+  
+    return total / count;
+  },
+
 }
 
 

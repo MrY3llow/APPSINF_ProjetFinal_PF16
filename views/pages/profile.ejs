@@ -14,8 +14,15 @@
       </div>
       
       <p class="profile-points">Points : <%= user.points %></p>
-        <div class="profile-stars">★★★★★</div> <!-- [TODO] Afficher les étoiles selon user.rankingAverage (de 1 à 5) -->
-        <div class="profile-balance"><%= user.balance %> €</div>
+      <p class="profile-stars">
+        Note moyenne :
+        <% if (reviewAverage === null) { %>
+          Aucune note
+        <% } else { %>
+          <%= reviewAverage.toFixed(1) %> ★
+        <% } %>
+      </p>
+      <div class="profile-balance"><%= user.balance %> €</div>
       <div class="actions">
         <input
           type="number"

@@ -35,7 +35,6 @@ function filter(sells, priceMin, priceMax, category, categoryFilters) {
     if (accept && categoryFilters) {
       for (let filter in categoryFilters) {
         if (sell.filter != undefined && sell.filter.hasOwnProperty(filter)) {
-          console.log(sell.filter[filter])
           if (!categoryFilters[filter].includes(sell.filter[filter])) {
             accept = false;
             break;

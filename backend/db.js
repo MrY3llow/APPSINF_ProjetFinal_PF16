@@ -301,7 +301,6 @@ const user = {
       .find({ owner : username })
       .sort({ date: -1 })
       .toArray();
-    console.log("Found sells:", sells); 
     return sells;
   },
 

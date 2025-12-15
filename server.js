@@ -122,7 +122,10 @@ async function main() {
 
       // // TRI
       // // Applique le tri (date, prix)
-      // sells = utils.sort(sells, sortType)
+      let sortType = req.query.sort;
+      if (sortType) {
+        sells = utils.sort(sells, sortType)
+      }
 
 
       res.render("layout", {  // Rendu de la page

@@ -34,21 +34,31 @@
       <p class="card-subtitle">Encore <%= sell.quantity%> en stock • Vendu par <%= sell.owner %></p>
     <% } %>
 
+    <%
+      var rating;
+      if (sell.buyers) {
+        let buyer = sell.buyers.find(b => b.username === username)
+        if (buyer && buyer.hasOwnProperty('rating')) {
+          rating = buyer.rating;
+        }
+      }
+    %>
+
   <p class="product-price"><%= sell.price %> €</p>
   <div class="actions">
     <a class="btn-outline nav-link" href="/product/<%= sell._id %>">Voir le produit</a>
       <% if (origin == "purchase-history") { %>
         <form id="rating-form-<%= sell._id %>" method="POST" style="display: inline;">
           <div class="rating">
-            <input type="radio" id="star1-<%= sell._id %>" name="rating" value="5" onchange="submitRating('<%= sell._id %>', 5)" />
+            <input type="radio" id="star1-<%= sell._id %>" name="rating" value="5" onchange="submitRating('<%= sell._id %>', 5)" <% if (rating == 5) { %>checked<% } %>/>
             <label for="star1-<%= sell._id %>">★</label>
-            <input type="radio" id="star2-<%= sell._id %>" name="rating" value="4" onchange="submitRating('<%= sell._id %>', 4)" />
+            <input type="radio" id="star2-<%= sell._id %>" name="rating" value="4" onchange="submitRating('<%= sell._id %>', 4)" <% if (rating == 4) { %>checked<% } %>/>
             <label for="star2-<%= sell._id %>">★</label>
-            <input type="radio" id="star3-<%= sell._id %>" name="rating" value="3" onchange="submitRating('<%= sell._id %>', 3)" />
+            <input type="radio" id="star3-<%= sell._id %>" name="rating" value="3" onchange="submitRating('<%= sell._id %>', 3)" <% if (rating == 3) { %>checked<% } %>/>
             <label for="star3-<%= sell._id %>">★</label>
-            <input type="radio" id="star4-<%= sell._id %>" name="rating" value="2" onchange="submitRating('<%= sell._id %>', 2)" />
+            <input type="radio" id="star4-<%= sell._id %>" name="rating" value="2" onchange="submitRating('<%= sell._id %>', 2)" <% if (rating == 2) { %>checked<% } %>/>
             <label for="star4-<%= sell._id %>">★</label>
-            <input type="radio" id="star5-<%= sell._id %>" name="rating" value="1" onchange="submitRating('<%= sell._id %>', 1)" />
+            <input type="radio" id="star5-<%= sell._id %>" name="rating" value="1" onchange="submitRating('<%= sell._id %>', 1)" <% if (rating == 1) { %>checked<% } %>/>
             <label for="star5-<%= sell._id %>">★</label>
           </div>
         </form>

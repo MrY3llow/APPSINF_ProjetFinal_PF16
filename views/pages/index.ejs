@@ -92,7 +92,22 @@
 
     <section class="card">
       <header class="card-head">
-        <h1 class="card-title">Produits disponibles</h1>
+        <div class="card-head-content">
+          <h1 class="card-title">Produits disponibles</h1>
+          
+          <!-- Barre de tri -->
+          <div class="sort-bar">
+            <label for="sort-select" class="sort-label">Trier par :</label>
+            <select id="sort-select" class="sort-select">
+              <option value="">Par défaut</option>
+              <option value="price-asc">Prix croissant</option>
+              <option value="price-desc">Prix décroissant</option>
+              <option value="rating">Rating vendeur</option>
+              <option value="date-asc">Date croissante</option>
+              <option value="date-desc">Date décroissante</option>
+            </select>
+          </div>
+        </div>
       </header>
 
       <div class="products-grid">
@@ -180,5 +195,32 @@
     
     // Redirection vers la page d'accueil avec les paramètres
     window.location.href = '/?' + params.toString();
+  });
+
+
+
+  // Gestion du tri des produits
+  document.getElementById('sort-select').addEventListener('change', function() {
+    const sortValue = this.value;
+    const params = new URLSearchParams(window.location.search);
+    
+    if (sortValue) {
+      params.set('sort', sortValue);
+    } else {
+      params.delete('sort');
+    }
+    
+    // Redirection avec le paramètre de tri
+    window.location.href = '/?' + params.toString();
+  });
+
+  // Pré-sélectionner l'option de tri si présente dans l'URL
+  window.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const sortValue = params.get('sort');
+    
+    if (sortValue) {
+      document.getElementById('sort-select').value = sortValue;
+    }
   });
 </script>

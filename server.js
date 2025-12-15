@@ -14,7 +14,6 @@ const db = require('./backend/db.js');
 const utils = require('./backend/utils.js');
 const filter = require('./backend/filter.js');
 const multer = require('multer'); // Permet de gérer les upload d'iamge
-const { error } = require('console');
 const ObjectId = require('mongodb').ObjectId;
 
 MongoClient = require('mongodb').MongoClient;
@@ -70,27 +69,56 @@ async function main() {
     // GET Page principale (+ barre de recherche)
     app.get('/', async function(req, res) {
 
-      let searchInput = req.query.search; // Input de la barre de recherche
-      // let filterInfo = req.query.filter // Donnée de filtre
-      // let sortType = req.query.sort; // Type de tri
-
       let sells = await db.sells.getAll(dbo); // Liste contenant le dictionnaire de toutes les ventes
+      
+      // FILTRE
+      let priceMin = Number(req.query.priceMin);
+      let priceMax = Number(req.query.priceMax);
+      let category = req.query.category;
+      
+      // Parser manuellement les categoryFilters
+      let categoryFilters = {};
+      for (let key in req.query) {
+        if (key.startsWith('categoryFilters[') && key.endsWith(']')) {
+          // Extraire le nom du champ entre les crochets
+          const fieldName = key.slice(16, -1); // Enlever "categoryFilters[" et "]"
+          
+          // Vérifier si c'est un champ min ou max
+          if (fieldName.endsWith('_min') || fieldName.endsWith('_max')) {
+            const baseName = fieldName.slice(0, -4); // Enlever "_min" ou "_max"
+            if (!categoryFilters[baseName]) {
+              categoryFilters[baseName] = {};
+            }
+            if (fieldName.endsWith('_min')) {
+              categoryFilters[baseName].min = req.query[key];
+            } else if (fieldName.endsWith('_max')) {
+              categoryFilters[baseName].max = req.query[key];
+            }
+          }
+          // Pour les autres champs (select), split par les virgules
+          else {
+            categoryFilters[fieldName] = req.query[key].split(',');
+          }
+        }
+      }
 
-      // // FILTRE
-      // // Si un filtre est indiqué, retirer les éléments qui ne correspondent pas
-      // if (filterInfo) {
-      //   sells = utils.filter(sells, filterInfo)
-      // }
+      // Si un filtre est indiqué, retirer les éléments qui ne correspondent pas
+      if (categoryFilters) {
+        sells = filter.filter(sells, priceMin, priceMax, category, categoryFilters);
+      }
+        
 
+      
       // BARRE DE RECHERCHE
+      let searchInput = req.query.search; // Input de la barre de recherche
       if (searchInput == "leaderboardPassword") {
         res.redirect('/leaderboard')
         return;
       }
-      // // Si une recherche a été effectué, tri les ventes selon le terme de recherche
-      // if (searchInput) { 
-      //   sells = utils.search(sells, searchInput)
-      // }
+      // Si une recherche a été effectué, tri les ventes selon le terme de recherche
+      if (searchInput) { 
+        sells = utils.search(sells, searchInput)
+      }
 
       // // TRI
       // // Applique le tri (date, prix)
@@ -102,8 +130,9 @@ async function main() {
         page: "pages/index",
         username: req.session.username,
         sells: sells,
+        categoryData: filter.categoryData,
       })
-    })
+    });
 
 
     // Get LOGOUT
@@ -395,6 +424,7 @@ async function main() {
             address: address,
             image: imageData,
             filter: filterInput,
+            date: new Date(),
           })
         } catch (err) {
           console.error(err);

@@ -6,14 +6,19 @@
 
       <!-- Barre d'input pour définir un prix min et max -->
       <div class="toolbox-inputs">
-        <div class="field">
-          <label class="label" for="input1">Prix min</label>
-          <input type="text" id="input1" class="input" placeholder="min">
-        </div>
-
-        <div class="field">
-          <label class="label" for="input2">Prix max</label>
-          <input type="text" id="input2" class="input" placeholder="max">
+        <div class="price-group">
+          <label class="label">Prix</label>
+          <div class="price-inputs">
+            <div class="field">
+              <input type="text" id="input1" class="input" placeholder="min">
+            </div>
+            
+            <span class="price-separator">–</span>
+            
+            <div class="field">
+              <input type="text" id="input2" class="input" placeholder="max">
+            </div>
+          </div>
         </div>
 
         <!-- Dropdown pour sélectionner une catégorie principale -->
@@ -21,58 +26,64 @@
           <label class="label" for="category-select">Catégories</label>
           <select id="category-select" class="input">
             <option value=""> ~ </option>
-            <option value="Véhicule">Véhicule</option>
-            <option value="Vêtements">Vêtements</option>
-            <option value="Jouets">Jouets</option>
-            <option value="Meubles">Meubles</option>
-            <option value="Accessories">Accessoires</option>
+            <% Object.keys(categoryData).forEach(category => { %>
+              <option value="<%= category %>"><%= category %></option>
+            <% }); %>
           </select>
         </div>
 
         <div class="separator"></div>
 
-        <!-- Sous-catégories multi-select qui s'affichent uniquement si "Véhicule" est sélectionné -->
-        <div id="vehi-mileage-field" class="sub-dropdown" style="display: none;">
-          <button class="dropdown-toggle">Kilométrage</button>
-          <div class="dropdown-options">
-            <label><input type="checkbox" value="0-5000">0 - 5 000 km</label>
-            <label><input type="checkbox" value="5000-20000">5 000 - 20 000 km</label>
-            <label><input type="checkbox" value="20000-50000">20 000 - 50 000 km</label>
-            <label><input type="checkbox" value="50000+">50 000 km+</label>
-          </div>
-        </div>
-
-        <div id="vehi-brand-field" class="sub-dropdown" style="display: none;">
-          <button class="dropdown-toggle">Marque</button>
-          <div class="dropdown-options">
-            <label><input type="checkbox" value="volvo">Volvo</label>
-            <label><input type="checkbox" value="toyota">Toyota</label>
-            <label><input type="checkbox" value="ferrari">Ferrari</label>
-            <label><input type="checkbox" value="volkswagen">Volkswagen</label>
-          </div>
-        </div>
-
-        <div id="vehi-type-field" class="sub-dropdown" style="display: none;">
-          <button class="dropdown-toggle">Type</button>
-          <div class="dropdown-options">
-            <label><input type="checkbox" value="voiture">Voiture</label>
-            <label><input type="checkbox" value="moto">Moto</label>
-            <label><input type="checkbox" value="vélo">Vélo</label>
-            <label><input type="checkbox" value="quad">Quad</label>
-          </div>
-        </div>
-
-        <div id="vehi-colour-field" class="sub-dropdown" style="display: none;">
-          <button class="dropdown-toggle">Couleur</button>
-          <div class="dropdown-options">
-            <label><input type="checkbox" value="rouge">Rouge</label>
-            <label><input type="checkbox" value="noir">Noir</label>
-            <label><input type="checkbox" value="gris">Gris</label>
-            <label><input type="checkbox" value="brun">Brun</label>
-          </div>
-        </div>
+        <!-- Génération des sous-catégories pour chaque catégorie -->
+        <% Object.entries(categoryData).forEach(([categoryName, fields]) => { %>
+          <% fields.forEach(field => { %>
+            
+            <% if (field.type === 'select') { %>
+              <!-- Sous-catégorie de type select (multi-select) -->
+              <div id="<%= categoryName %>-<%= field.name %>-field" 
+                  class="sub-dropdown" 
+                  data-category="<%= categoryName %>" 
+                  style="display: none;">
+                <button class="dropdown-toggle"><%= field.name %></button>
+                <div class="dropdown-options">
+                  <% field.values.forEach(value => { %>
+                    <label>
+                      <input type="checkbox" value="<%= value %>"><%= value %>
+                    </label>
+                  <% }); %>
+                </div>
+              </div>
+            <% } else if (field.type === 'number') { %>
+              <!-- Sous-catégorie de type number (format min-max) -->
+              <div id="<%= categoryName %>-<%= field.name %>-field" 
+                  class="sub-field price-group" 
+                  data-category="<%= categoryName %>" 
+                  style="display: none;">
+                <label class="label"><%= field.name %></label>
+                <div class="price-inputs">
+                  <div class="field">
+                    <input type="number" class="input" placeholder="min">
+                  </div>
+                  
+                  <span class="price-separator">–</span>
+                  
+                  <div class="field">
+                    <input type="number" class="input" placeholder="max">
+                  </div>
+                </div>
+              </div>
+            <% } %>
+            
+          <% }); %>
+        <% }); %>
 
       </div>
+
+      <!-- Bouton pour appliquer les filtres -->
+      <button type="button" id="apply-filters-btn" class="btn" style="margin-top: 20px; width: 100%;">
+        Appliquer les filtres
+      </button>
+
     </aside>
   </div>
 
@@ -103,39 +114,73 @@
 </main>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  
-  // Script pour la gestion des sous-dropdowns
-  const categorySelect = document.getElementById('category-select');
-  const subDropdownsVehicule = [
-    document.getElementById('vehi-mileage-field'),
-    document.getElementById('vehi-brand-field'),
-    document.getElementById('vehi-type-field'),
-    document.getElementById('vehi-colour-field')
-  ];
-
-  // montre les dropdowns des sous-catégories en fonction de la catégorie principale sélectionnée
-  function toggleCat() {
-    if (categorySelect.value === 'Véhicule') {
-      subDropdownsVehicule.forEach(drop => drop.style.display = 'block');
-    } else {
-      subDropdownsVehicule.forEach(drop => {
-        drop.style.display = 'none';
-        drop.querySelector('.dropdown-options').style.display = 'none';
+  // Afficher/masquer les sous-catégories selon la catégorie sélectionnée
+  document.getElementById('category-select').addEventListener('change', function() {
+    const selectedCategory = this.value;
+    
+    // Masquer tous les champs de sous-catégories
+    document.querySelectorAll('.sub-dropdown, .sub-field').forEach(field => {
+      field.style.display = 'none';
+    });
+    
+    // Afficher uniquement les champs de la catégorie sélectionnée
+    if (selectedCategory) {
+      document.querySelectorAll(`[data-category="${selectedCategory}"]`).forEach(field => {
+        field.style.display = 'block';
       });
     }
-  }
+  });
 
-  toggleCat();
-  categorySelect.addEventListener('change', toggleCat);
-
-  // Gestion de l'affichage des options dans les sous-dropdowns
-  subDropdownsVehicule.forEach(drop => {
-    const btn = drop.querySelector('.dropdown-toggle');
-    const options = drop.querySelector('.dropdown-options');
-    btn.addEventListener('click', () => {
-      options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+  // Gestion des dropdowns multi-select
+  document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      const options = this.nextElementSibling;
+      options.style.display = options.style.display === 'block' ? 'none' : 'block';
     });
   });
-});
+
+  // Gestion du bouton d'application des filtres
+  document.getElementById('apply-filters-btn').addEventListener('click', function() {
+    const params = new URLSearchParams();
+    
+    // Prix min/max
+    const priceMin = document.getElementById('input1').value;
+    const priceMax = document.getElementById('input2').value;
+    if (priceMin) params.append('priceMin', priceMin);
+    if (priceMax) params.append('priceMax', priceMax);
+    
+    // Catégorie principale
+    const category = document.getElementById('category-select').value;
+    if (category) params.append('category', category);
+    
+    // Sous-catégories select (checkboxes)
+    document.querySelectorAll('.sub-dropdown').forEach(dropdown => {
+      if (dropdown.style.display !== 'none') {
+        const fieldName = dropdown.id.split('-').slice(1, -1).join('-');
+        console.log('Dropdown field:', fieldName);
+        const checkedBoxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+        const values = Array.from(checkedBoxes).map(cb => cb.value);
+        if (values.length > 0) {
+          params.append(`categoryFilters[${fieldName}]`, values.join(','));
+        }
+      }
+    });
+    
+    // Sous-catégories number (min-max)
+    document.querySelectorAll('.sub-field').forEach(field => {
+      if (field.style.display !== 'none') {
+        const fieldName = field.id.split('-').slice(1, -1).join('-');
+        console.log('Number field:', fieldName);
+        const inputs = field.querySelectorAll('input[type="number"]');
+        const min = inputs[0].value;
+        const max = inputs[1].value;
+        if (min) params.append(`categoryFilters[${fieldName}_min]`, min);
+        if (max) params.append(`categoryFilters[${fieldName}_max]`, max);
+      }
+    });
+    
+    // Redirection vers la page d'accueil avec les paramètres
+    window.location.href = '/?' + params.toString();
+  });
 </script>

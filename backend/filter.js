@@ -7,18 +7,51 @@ const categoryData = {
     {"name": "Nombre de roue", "type": "number"},
     {"name": "Kilométrage", "type": "number"},
   ],
+  "Miam" : [
+    {"name": "Typede mial", "type": "select", "values": ["Burger", "Pizza", "Sushi"]},
+    {"name": "Couleur", "type": "select", "values": ["Rouge", "Bleu", "Noir", "Blanc", "Gris", "Vert", "Jaune", "Orange"]},
+    {"name": "Kilo", "type": "number"},
+  ],
 }
 
+function filter(sells, priceMin, priceMax, category, categoryFilters) {
+  let result = [];
 
-function getCategoryFilter(category) {
-  filters = []
-  for (let filter of categoryData[category]) {
-    filters.push(filter.name)
+  for (let sell of sells) {
+    let accept = true;
+
+    // 1. Vérification de la catégorie
+    if (category != undefined &&sell.category != category) {
+      accept = false;
+    }
+    
+    // 2. Vérification du prix
+    if (accept && ((priceMin != undefined && sell.price < priceMin) || (priceMax != undefined && sell.price > priceMax))) {
+      accept = false;
+    }
+
+    // 3. Vérification des filtres spécifiques à la catégorie
+    if (accept && categoryFilters) {
+      for (let filter in categoryFilters) {
+        if (sell.filter != undefined && sell.filter.hasOwnProperty(filter)) {
+          console.log(sell.filter[filter])
+          if (!categoryFilters[filter].includes(sell.filter[filter])) {
+            accept = false;
+            break;
+          }
+        }
+      }
+    }
+
+    // S'il est accepté, on l'ajoute.
+    if (accept) {
+      result.push(sell);
+    }
   }
-  return filters
+  return result;
 }
-
 
 module.exports = {
-  categoryData: categoryData
+  categoryData: categoryData,
+  filter: filter,
 }

@@ -15,19 +15,19 @@
 
       <!-- INPUT >   Title -->
       <div class="field">
-        <label for="title" class="label">Titre</label>
+        <label for="title" class="label">Titre <span class="required">*</span></label>
         <input id="title" type="text" name="title" class="input" placeholder="Titre de la vente" value="<%= titleInput %>">
       </div>
 
       <!-- INPUT >   Description -->
       <div class="field">
-        <label for="description" class="label">Description</label>
+        <label for="description" class="label">Description <span class="required">*</span></label>
         <textarea id="description" name="description" class="input input-area" placeholder="Description de la vente"><%= descriptionInput %></textarea>
       </div>
 
       <!-- INPUT > Image -->
       <div class="field">
-        <label for="image" class="label">Image</label>
+        <label for="image" class="label">Image <span class="required">*</span></label>
         <div class="image-upload-container">
           <label for="image" class="image-upload-btn">Choisir une image</label>
           <input id="image" type="file" name="image" class="image-input" accept="image/*">
@@ -38,40 +38,34 @@
             
       <!-- INPUT >   Adresse -->
       <div class="field">
-        <label for="address" class="label">Address</label>
+        <label for="address" class="label">Address <span class="required">*</span></label>
         <input id="address" type="text" name="address" class="input" placeholder="Adresse" value="<%= addressInput %>">
       </div>
 
       <!-- INPUT >   Prix -->
       <div class="field">
-        <label for="price" class="label">Prix</label>
+        <label for="price" class="label">Prix <span class="required">*</span></label>
         <input id="price" type="number" name="price" class="input" placeholder="Prix" value="<%= priceInput %>" min="0.01" step="0.01">
       </div>
 
       <!-- INPUT >   Quantité -->
       <div class="field">
-        <label for="quantity" class="label">Quantité</label>
+        <label for="quantity" class="label">Quantité <span class="required">*</span></label>
         <input id="quantity" type="number" name="quantity" class="input" placeholder="Quantité" value="<%= quantityInput %>" min="1" step="1">
       </div>
 
       <!-- SELECT >   Catégorie -->
       <div class="field">
-        <label for="category" class="label">Catégorie</label>
-        <select id="category" name="category" class="input" required>
-          <% if (!categoryInput) { %>
-            <option value="" disabled selected>Sélectionnez une catégorie</option>
-          <% } %>
+        <label for="category" class="label">Catégorie <span class="required">*</span></label>
+        <select id="category" name="category" class="input">
+          <option value="" disabled <% if (!categoryInput) { %> selected <% } %>> Sélectionnez une catégorie</option>
           <% for(let categoryName in categoryData) { %>
-            <% if (categoryName == categoryInput) { %>
-              <option value="<%= categoryName %>" selected><%= categoryName %></option>
-            <% } else {  %>
-              <option value="<%= categoryName %>"><%= categoryName %></option>
-            <% } %>
+              <option value="<%= categoryName %>" <% if (categoryInput == categoryName) { %> selected <% } %> ><%= categoryName %></option>
           <% } %>
         </select>
       </div>
 
-      <!-- ZZone dynamique pour les filtres spécifiques -->
+      <!-- Zone dynamique pour les filtres spécifiques -->
       <div id="dynamic-fields"></div>
       
       <!-- BUTTON >   Envoyer le formulaire -->
@@ -104,9 +98,9 @@
 
         const label = document.createElement('label');
         label.className = 'label';
-        label.textContent = filter.name;
         
-        const fieldId = `filter_${filter.name}`
+        label.textContent = filter.name;
+        const fieldId = `filter_${filter.name}`;
         label.setAttribute('for', fieldId);
 
 
@@ -175,17 +169,5 @@
         preview.classList.remove('show');
       }
     });
-
-    // code pour empêcher la sélection de plusieurs options simultanément
-    options.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        if (cb.checked) {
-          options.querySelectorAll('input[type="checkbox"]').forEach(other => {
-            if (other !== cb) other.checked = false;
-          });
-        }
-      });
-    });
-  });
-</script>
+  </script>
 </main>

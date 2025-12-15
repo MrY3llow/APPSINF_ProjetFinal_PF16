@@ -5,32 +5,15 @@
       <h1 class="card-title">Mes historiques d'achats</h1>
     </header>
 
-    <div style="
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(1000px, 1fr)); 
-      gap: 20px;">
+    <!-- Affiche les achats en utilisant le modèle -->
+    <% for (let sell of sells) { %>
+      <%- include('../partials/product-card', {sell: sell, origin: "purchase-history"}) %>
+    <% } %>
 
-      <div class="card">
-        <h2 class="card-title">iPhone 0 promax</h2>
-        <p class="card-subtitle">État impeccable, 0 </p>
-        <p style="font-weight:bold; font-size:18px;">2099€</p>
-        <div class="actions">
-          <a class="btn-outline nav-link" href="#">Voir le produit</a>
-        </div>
-        <div class="rating">
-          <input type="radio" id="star5" name="rating" value="1" />
-          <label for="star5">★</label>
-          <input type="radio" id="star4" name="rating" value="2" />
-          <label for="star4">★</label>
-          <input type="radio" id="star3" name="rating" value="3" />
-          <label for="star3">★</label>
-          <input type="radio" id="star2" name="rating" value="4" />
-          <label for="star2">★</label>
-          <input type="radio" id="star1" name="rating" value="5" />
-          <label for="star1">★</label>
-        </div>
-      </div>
-
-    </div>
+    <!-- Si aucun achat -->
+    <% if (sells.length == 0) { %>
+      <p>Vous n'avez réaliser aucun achat pour l'instant.<p>
+    <% } %>
+    
   </section>
 </main>

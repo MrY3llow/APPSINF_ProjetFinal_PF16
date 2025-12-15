@@ -134,7 +134,6 @@ const sells = {
    */
   isPurchasable : async function (dbo, id) {
     try {
-      console.log(id)
       sell = await dbo.collection('sells').findOne({ _id: id });
       return (sell.quantity > 0);
     } catch (err) {
@@ -157,14 +156,13 @@ const sells = {
         { _id: id }, 
         { 
           $inc: { quantity: -1 },
-          $push: { buyers: { username: username } }
+          $push: { buyers: { username: username, date: new Date() } }
         }
       );
     } else {
       throw new Error(`La vente n'est pas achetable.`);
     }
   },
-
 
 
 }
@@ -194,6 +192,8 @@ const user = {
       passwordHash: utils.hashString(password),
       fullname: fullname,
       email: email,
+      points: 0,
+      balance: 0,
     })
   },
 
@@ -258,23 +258,110 @@ const user = {
 
 
   /**
-   * Obtiens le nom complet d'un utilisateur en de du nom d'utilisateur.
+   * Obtiens le dictionnaire de l'utilisateur depuis la base de donnée à partir du nom d'utilisateur.
    * @async
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
    * @param {string} username - Le nom d'utilisateur
-   * @return {string} Le nom complet de l'utilisateur
+   * @return {Object} Le dictionnaire de l'utilisateur
    * @throws {Error} Si la requête à la base de données échoue
    * @exemple ```
-   * let fullName = await user.getNameFromUsername(dbo, "Mr_Yellow_")
-   * > fullName = "Nathan Cobut"
+   * let user = await user.getUserFromUsername(dbo, "Mr_Yellow_")
+   * > user = {username: "Nathan", ...}
    * ```
    */
-  getNameFromUsername : async function(dbo, username) {
-    let result = await dbo.collection('users').findOne({
+  getUserFromUsername : async function(dbo, username) {
+    return await dbo.collection('users').findOne({
       username: username
     })
-    return result.fullname;
+  },
+
+  /**
+   * Retourne la listes des ventes que l'utilisateur à acheter, dans l'ordre de leur achat.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   */
+  getSellHistory : async function(dbo, username) {
+    let sells = await dbo.collection('sells')
+      .find({
+        buyers: { $elemMatch: { username: username } }
+      })
+      .sort({ 'buyers.date': -1 })
+      .toArray();
+    return sells;
+  },
+
+  /**
+   * Renvois les points d'un utilisateur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   */
+  getPoints : async function (dbo, username) {
+    return await dbo.collection('users').findOne({ username: username }).points;
+  },
+
+  
+  /**
+   * Change la photo de l'utilisateur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   * @param {Object} photo - La photo à stocker dans la base de donnée.
+   */
+  changeUserPhoto(dbo, username, photo) {
+    dbo.collection('users').updateOne(
+      { username: username },
+      { $set: { photo: photo } }
+    )
+  },
+
+
+  /**
+   * Moddifie le montant des fonds de l'utilisateur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   * @param {number} amount - Le montant (positif ou négatif) à ajouter a la valeur actuelle.
+   */
+  addBalance(dbo, username, amount) {
+    dbo.collection('users').updateOne(
+      { username: username },
+      { $inc: { balance: amount } }
+    )
   }
+
+}
+
+
+//   +-----------------+
+//   |   LEADERBOARD   |
+//   +-----------------+
+
+const leaderboard = {
+
+  /**
+   * Retourne les 5 premiers membres du classement.
+   * Utilise la fonction getFirst(dbo, 5). Permet de rendre le numéro 5 le nombre par défaut.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   */
+  getFirst(dbo) {
+    this.getFirst(dbo, 5);
+  },
+
+  /**
+   * Retourne les X premiers membres du classement.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   */
+  getFirst(dbo, number) {
+    return dbo.collection('users')
+      .find()
+      .sort({ points: -1 })
+      .limit(parseInt(number, 10))
+      .toArray();
+  },
 
 }
 
@@ -282,4 +369,5 @@ const user = {
 module.exports = {
   user: user,
   sells: sells,
+  leaderboard: leaderboard,
 }

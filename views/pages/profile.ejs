@@ -5,23 +5,41 @@
 
       <div class="profile-header-info">
         <div class="profile-photo-wrapper">
-        <img src="pdp.png" alt="Photo de profil" class="profile-photo">
+        <img src="/image/user/<%= user.username %>" alt="Photo de profil" class="profile-photo">
         <div class="profile-shortcuts">
           <a href="historique_ventes.html" class="btn-outline">Mes ventes</a>
           <a href="historique_achat.html" class="btn-outline">Mes achats</a>
           <a href="ranking.html" class="btn-outline">Rank</a>
         </div>
-        <h2 class="profile-username">Sergio</h2>
+        <h2 class="profile-username"><%= user.username %></h2>
       </div>
       
-      <p class="profile-points">llvPoints : +999</p>
-        <div class="profile-stars">★★★★★</div>
-        <div class="profile-balance">Solde : 5.00€</div>
-      <button class="btn-outline">Ajouter des fonds</button>
+      <p class="profile-points">Points : <%= user.points %></p>
+        <div class="profile-stars">★★★★★</div> <!-- [TODO] Afficher les étoiles selon user.rankingAverage (de 1 à 5) -->
+        <div class="profile-balance"><%= user.balance %> €</div>
+      <div class="actions">
+        <input
+          type="number"
+          id="add-balance-input"
+          class="input"
+          placeholder="Montant en €"
+          min="1"
+          step="0.01"
+        />
+        <button class="btn-outline" id="add-balance-btn">
+          Valider
+        </button>
+      </div>
+
       
+      <!-- INPUT > Image -->
       <div class="field">
-        <label class="label">Modifier l’image</label>
-        <input type="text" class="input" placeholder="Entrez l’URL de l’image">
+        <label for="image" class="label">Modifier la photo de profile</label>
+        <div class="image-upload-container">
+          <label for="image" class="image-upload-btn">Choisir une image</label>
+          <input id="image" type="file" name="image" class="image-input" accept="image/*">
+        </div>
+        <small class="field-hint">Formats acceptés : JPG, PNG, WEBP. Taille max : 5 MB</small>
       </div>
         
       </div>
@@ -37,19 +55,79 @@
 
       <div class="profile-actions">
 
-      <a class="brand" href="historique_ventes.html" aria-label="Accueil">
-        <button class="btn-outline">Consulter ses ventes</button>
-        </span>
-      </a>
+        <a class="brand" href="/mySells" aria-label="Accueil">
+          <button class="btn-outline">Consulter ses ventes</button>
+          </span>
+        </a>
 
-      <a class="brand" href="historique_achat.html" aria-label="Accueil">
-        <button class="btn-outline">Consulter ses achats</button>
-        </span>
-      </a>
+        <a class="brand" href="/purchase-history" aria-label="Accueil">
+          <button class="btn-outline">Consulter ses achats</button>
+          </span>
+        </a>
 
-        <button class="btn profile-logout">Déconnexion</button>
+        <a href="/logout">
+          <button class="btn profile-logout">Déconnexion</button>
+        </a>
       </div>
 
     </div>
   </section>
+
+  <script>
+    // Gestion de l'envoi de l'image au serveur
+    document.getElementById('image').addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      
+      if (file && file.type.startsWith('image/')) {
+        // Envoyer l'image au serveur
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+          const response = await fetch('/profile/updateImage', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (response.ok) {
+            // Recharger la page pour afficher la nouvelle photo
+            window.location.reload();
+          } else {
+            console.error('Erreur lors de l\'upload:', response.statusText);
+            alert('Erreur lors de la mise à jour de la photo de profil');
+          }
+        } catch (error) {
+          console.error('Erreur réseau:', error);
+          alert('Erreur de connexion au serveur');
+        }
+      }
+    });
+
+  // Gestion de l'ajout de fonds
+  document.getElementById('add-balance-btn').addEventListener('click', async () => {
+    const input = document.getElementById('add-balance-input');
+    const value = input.value;
+
+    if (!value) {
+      alert('Veuillez entrer un montant valide');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/profile/addBalance/${value}`, {
+        method: 'POST'
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert('Erreur lors de l\'ajout des fonds');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Erreur de connexion au serveur');
+    }
+  });
+  </script>
+
 </main>

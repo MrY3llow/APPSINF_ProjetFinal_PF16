@@ -142,7 +142,7 @@ const sells = {
 
   /**
    * Réalise l'achat d'une vente d'un utilisateur.
-   * La quantité disponible diminue de 1.
+   * La quantité disponible diminue de 1, et l'argent est transféré de l'acheteur au vendeur.
    * @async
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
    * @param {Object} id - L'id de la vente
@@ -158,6 +158,8 @@ const sells = {
           $push: { buyers: { username: username, date: new Date() } }
         }
       );
+      // Fait payer l'utilisateur
+      await user.pay(dbo, username, sell.owner, sell.price);
     } else {
       throw new Error(`La vente n'est pas achetable.`);
     }
@@ -181,7 +183,7 @@ const sells = {
         $set: { 'buyers.$.rating': rating }
       }
     );
-  }
+  },
 
 
 }
@@ -351,6 +353,21 @@ const user = {
 
 
   /**
+   * Retourne l'argent d'un utilisateur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   */
+  getBalance : async function (dbo, username) {
+    if (!username) { return 0 }
+    let user = await dbo.collection('users').findOne({ username: username });
+    if (!user) { return 0 }
+    let balance = user.balance || 0;
+    return balance;
+  },
+
+
+  /**
    * Moddifie le montant des fonds de l'utilisateur.
    * @async
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
@@ -362,6 +379,29 @@ const user = {
       { username: username },
       { $inc: { balance: amount } }
     )
+  },
+
+  /**
+   * Transfer money from an account to another.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} usernameFrom - Le nom d'utilisateur qui paye
+   * @param {string} usernameTo - Le nom d'utilisateur qui recoit.
+   */
+  pay : async function(dbo, usernameFrom, usernameTo, amount) {
+    // Vérification que usernameFrom à le montant nécessaire
+    if ((await dbo.collection('users').findOne({ username: usernameFrom })).balance < amount) {
+      throw(new Error("L'utilisateur n'a pas assez de fonds."));
+    }
+
+    await dbo.collection('users').updateOne(
+      { username: usernameFrom },
+      { $inc: { balance: -amount } }
+    );
+    await dbo.collection('users').updateOne(
+      { username: usernameTo },
+      { $inc: { balance: amount } }
+    );
   },
 
 

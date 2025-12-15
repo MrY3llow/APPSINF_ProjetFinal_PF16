@@ -7,6 +7,7 @@ const categoryData = {
     {"name": "Nombre de roue", "type": "number"},
     {"name": "Kilométrage", "type": "number"},
   ],
+  "Divers" : [],
 }
 
 

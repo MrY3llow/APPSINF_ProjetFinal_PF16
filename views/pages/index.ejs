@@ -158,7 +158,6 @@
     document.querySelectorAll('.sub-dropdown').forEach(dropdown => {
       if (dropdown.style.display !== 'none') {
         const fieldName = dropdown.id.split('-').slice(1, -1).join('-');
-        console.log('Dropdown field:', fieldName);
         const checkedBoxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
         const values = Array.from(checkedBoxes).map(cb => cb.value);
         if (values.length > 0) {
@@ -171,7 +170,6 @@
     document.querySelectorAll('.sub-field').forEach(field => {
       if (field.style.display !== 'none') {
         const fieldName = field.id.split('-').slice(1, -1).join('-');
-        console.log('Number field:', fieldName);
         const inputs = field.querySelectorAll('input[type="number"]');
         const min = inputs[0].value;
         const max = inputs[1].value;

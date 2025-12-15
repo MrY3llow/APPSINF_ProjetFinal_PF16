@@ -466,7 +466,7 @@ async function main() {
 
     // Get PURCHASE HISTORY
     app.get('/purchase-history', async function(req, res) {
-      const sells = await db.user.getSellHistory(dbo, req.session.username);
+      const sells = await db.user.getPurchaseHistory(dbo, req.session.username);
       res.render("layout", {
         title: "Historique d'achat", // Titre qui est affiché dans l'onglet du naviguateur chrome
         page: "pages/purchase-history",
@@ -475,17 +475,14 @@ async function main() {
       })
     });
 
-
-    // Get SELL MODIFICATION
-    app.get('/sell-modification/:sellId', async function(req, res) {
-      // Page de démo pour l'instant
-      // Variable pas encore utiliser.
-      const sellId = req.params.sellId;
-
+    // Get SALE HISTORY
+    app.get('/sale-history', async function(req, res) {
+      const sells = await db.user.getSaleHistory(dbo, req.session.username);
       res.render("layout", {
-        title: "Moddification d'une vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
-        page: "pages/sell-modification",
+        title: "Historique de vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
+        page: "pages/sale-history",
         username: req.session.username,
+        sells: sells,
       })
     });
 

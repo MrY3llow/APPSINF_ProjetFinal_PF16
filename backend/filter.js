@@ -12,6 +12,7 @@ const categoryData = {
     {"name": "Couleur", "type": "select", "values": ["Rouge", "Bleu", "Noir", "Blanc", "Gris", "Vert", "Jaune", "Orange"]},
     {"name": "Kilo", "type": "number"},
   ],
+  "Divers" : [],
 }
 
 function filter(sells, priceMin, priceMax, category, categoryFilters) {

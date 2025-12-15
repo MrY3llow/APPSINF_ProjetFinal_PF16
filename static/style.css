@@ -220,6 +220,21 @@ img{ max-width:100%; display:block; }
   background: var(--primary);
 }
 
+/* style pour le changement de mdp dans profile */
+#change-password-btn {
+  margin-top: 10px;
+  width: 10vw !important;
+}
+
+#change-password-field {
+  border: 1px solid var(--border) ;      
+  border-radius: var(--radius);
+  padding: 12px; 
+  margin-bottom: 4vh;
+  margin-top: 2vh;
+  width: fit-content;
+}
+
 .card{
   background: var(--surface);
   border: 1px solid var(--border);

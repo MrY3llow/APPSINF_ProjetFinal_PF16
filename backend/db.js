@@ -394,6 +394,29 @@ const leaderboard = {
 
 }
 
+// Calcule la moyenne des notes reçues en tant que vendeur.
+getReviewAverage = async function (dbo, username) {
+  const sells = await dbo.collection('sells').find({owner: username, buyers: { $exists: true, $ne: [] }}).toArray();
+
+  let total = 0;
+  let count = 0;
+
+  for (const sell of sells) {
+    for (const buyer of sell.buyers) {
+      if (typeof buyer.rating === 'number') {
+        total += buyer.rating;
+        count += 1;
+      }
+    }
+  }
+
+  if (count === 0) {
+    return null;
+  }
+
+  return total / count;
+};
+
 
 module.exports = {
   user: user,

@@ -276,18 +276,33 @@ const user = {
   },
 
   /**
-   * Retourne la listes des ventes que l'utilisateur à acheter, dans l'ordre de leur achat.
+   * Retourne la listes des ventes que l'utilisateur à achetée, dans l'ordre de leur achat.
    * @async
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
    * @param {string} username - Le nom d'utilisateur
    */
-  getSellHistory : async function(dbo, username) {
+  getPurchaseHistory : async function(dbo, username) {
     let sells = await dbo.collection('sells')
       .find({
         buyers: { $elemMatch: { username: username } }
       })
       .sort({ 'buyers.date': -1 })
       .toArray();
+    return sells;
+  },
+
+    /**
+   * Retourne la listes des ventes que l'utilisateur à publiée, dans l'ordre de leur vente.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   */
+  getSaleHistory : async function(dbo, username) {
+    let sells = await dbo.collection('sells')
+      .find({ owner : username })
+      .sort({ date: -1 })
+      .toArray();
+    console.log("Found sells:", sells); 
     return sells;
   },
 

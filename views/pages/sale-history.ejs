@@ -1,0 +1,19 @@
+<main class="container">
+
+  <section class="card">
+    <header class="card-head">
+      <h1 class="card-title">Mon historique de ventes</h1>
+    </header>
+
+    <!-- Affiche les ventes en utilisant le modèle -->
+    <% for (let sell of sells) { %>
+      <%- include('../partials/product-card', {sell: sell, origin: "sale-history"}) %>
+    <% } %>
+
+    <!-- Si aucune vente -->
+    <% if (sells.length == 0) { %>
+      <p>Vous n'avez réaliser aucune vente pour l'instant.<p>
+    <% } %>
+    
+  </section>
+</main>

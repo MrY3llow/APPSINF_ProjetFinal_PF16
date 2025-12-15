@@ -271,7 +271,6 @@ async function main() {
 
       const user = await db.user.getUserFromUsername(dbo, username);
       const reviewAverage = await db.user.getReviewAverage(dbo, username);
-      console.log(reviewAverage)
 
       res.render("layout", {
         title: "Profil",

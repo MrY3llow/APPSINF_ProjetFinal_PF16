@@ -607,6 +607,43 @@ async function main() {
       }
     });
 
+    app.post('/profile/PasswordChange', async function(req, res) {
+      const username = req.session.username;
+      const newPassword = req.body.newPassword;
+      const copyNewPassword = req.body.copyNewPassword;
+
+      let error = "";
+
+      // Vérification des conditions
+      if (newPassword != copyNewPassword) { // Est-ce que les deux password complété correspondent
+        error += "Les deux mots de passe ne correspondent pas.\n"
+      } 
+      else if (!checkUserInput.isValidPassword(newPassword)) {  // Est-ce que le mot de passe est valide
+        error += "Le mot de passe n'est pas valide. Il doit :\n- faire plus de 8 caractères"
+      }
+
+      if (!error) {
+        try {
+          await db.user.changePassword(dbo, username, newPassword);
+        } catch (err) {
+          console.error(err);
+          error += "Une erreur est survenue avec la base de données.\n"
+        }
+      }
+
+      if (error) {
+        res.render("layout", {
+          title: "Inscription",
+          page: "pages/profile",
+          username: req.session.username,
+          user: await db.user.getUserFromUsername(dbo, req.session.username),
+          error: error,
+        })
+      } else {
+        res.redirect('/profile');
+      }
+    }); 
+
 
 
     // // Page inexistante, redirection vers la page principale

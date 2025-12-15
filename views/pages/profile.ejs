@@ -7,8 +7,8 @@
         <div class="profile-photo-wrapper">
         <img src="/image/user/<%= user.username %>" alt="Photo de profil" class="profile-photo">
         <div class="profile-shortcuts">
-          <a href="/sale-history" class="btn-outline">Mes ventes</a>
-          <a href="/purchase-history" class="btn-outline">Mes achats</a>
+          <a href="historique_ventes.html" class="btn-outline">Mes ventes</a>
+          <a href="historique_achat.html" class="btn-outline">Mes achats</a>
           <a href="ranking.html" class="btn-outline">Rank</a>
         </div>
         <h2 class="profile-username"><%= user.username %></h2>
@@ -47,24 +47,14 @@
     </div>
 
     <div class="profile-body">
-
-      <div class="field">
+      <div class="field" id="change-password-field">
         <label class="label">Modifier mot de passe</label>
-        <input type="password" class="input" placeholder="Entrer un nouveau mot de passe">
+        <input type="password" id="new-password" class="input" placeholder="Entrer un nouveau mot de passe">
+        <input type="password" id="copy-new-password" class="input" placeholder="Confirmer le mot de passe">
+        <button class="btn" id="change-password-btn">Changer de mot de passe</button>
       </div>
-
+      
       <div class="profile-actions">
-
-        <a class="brand" href="/mySells" aria-label="Accueil">
-          <button class="btn-outline">Consulter ses ventes</button>
-          </span>
-        </a>
-
-        <a class="brand" href="/purchase-history" aria-label="Accueil">
-          <button class="btn-outline">Consulter ses achats</button>
-          </span>
-        </a>
-
         <a href="/logout">
           <button class="btn profile-logout">Déconnexion</button>
         </a>
@@ -74,6 +64,37 @@
   </section>
 
   <script>
+    // Gestion changement de mot de passe
+    document.getElementById('change-password-btn').addEventListener('click', async () => {
+      const newPassword = document.getElementById('new-password').value;
+      const copyNewPassword = document.getElementById('copy-new-password').value;
+      if (newPassword !== copyNewPassword) {
+        alert('Les mots de passe ne correspondent pas');
+        return;
+      }
+      try {
+        const response = await fetch('/profile/PasswordChange', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ newPassword, copyNewPassword })
+        });
+
+        if (response.ok) {
+          alert('Mot de passe changé avec succès');
+          document.getElementById('new-password').value = '';
+          document.getElementById('copy-new-password').value = '';
+        } else {
+          alert('Erreur lors du changement de mot de passe');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Erreur de connexion au serveur');
+      }
+    });
+      
+    
     // Gestion de l'envoi de l'image au serveur
     document.getElementById('image').addEventListener('change', async function(e) {
       const file = e.target.files[0];

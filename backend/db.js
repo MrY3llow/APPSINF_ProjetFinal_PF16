@@ -346,6 +346,22 @@ const user = {
 
 }
 
+/**
+ * Change le mot de passe d'un utilisateur
+ * @async
+ * @param {Object} dbo - L'objet de la base de donnée MongoDB
+ * @param {string} username - Le nom d'utilisateur
+ * @param {string} newPassword - Le nouveau mot de passe en clair
+ */
+user.changePassword = async function(dbo, username, newPassword) {
+  const hashedPassword = utils.hashString(newPassword);
+  await dbo.collection('users').updateOne(
+    { username: username },
+    { $set: { passwordHash: hashedPassword } }
+  );
+};
+
+
 
 //   +-----------------+
 //   |   LEADERBOARD   |

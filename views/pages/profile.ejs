@@ -7,9 +7,8 @@
         <div class="profile-photo-wrapper">
         <img src="/image/user/<%= user.username %>" alt="Photo de profil" class="profile-photo">
         <div class="profile-shortcuts">
-          <a href="historique_ventes.html" class="btn-outline">Mes ventes</a>
-          <a href="historique_achat.html" class="btn-outline">Mes achats</a>
-          <a href="ranking.html" class="btn-outline">Rank</a>
+          <a href="sale-history" class="btn-outline">Mes ventes</a>
+          <a href="purchase-history" class="btn-outline">Mes achats</a>
         </div>
         <h2 class="profile-username"><%= user.username %></h2>
       </div>
@@ -68,10 +67,7 @@
     document.getElementById('change-password-btn').addEventListener('click', async () => {
       const newPassword = document.getElementById('new-password').value;
       const copyNewPassword = document.getElementById('copy-new-password').value;
-      if (newPassword !== copyNewPassword) {
-        alert('Les mots de passe ne correspondent pas');
-        return;
-      }
+
       try {
         const response = await fetch('/profile/PasswordChange', {
           method: 'POST',
@@ -81,15 +77,19 @@
           body: JSON.stringify({ newPassword, copyNewPassword })
         });
 
+        // Parser la réponse JSON
+        const data = await response.json();
+
         if (response.ok) {
-          alert('Mot de passe changé avec succès');
+          // Afficher le message de succès retourné par le serveur
+          alert(data.message || 'Mot de passe changé avec succès');
           document.getElementById('new-password').value = '';
           document.getElementById('copy-new-password').value = '';
         } else {
-          alert('Erreur lors du changement de mot de passe');
+          // Afficher le message d'erreur retourné par le serveur
+          alert(data.error || 'Erreur lors du changement de mot de passe');
         }
       } catch (error) {
-        console.error(error);
         alert('Erreur de connexion au serveur');
       }
     });

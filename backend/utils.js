@@ -130,6 +130,40 @@ function search(sells, input) {
 }
 
 
+/**
+ * Trie une liste de vente selon un critère.
+ * Critères possibles : 
+ * └─ "price-asc"  ──>  Le prix croissant. Les ventes les moins chères en premières.
+ * └─ "price-desc"  ─>  Le prix décroissant. Les ventes les plus chères en premières.
+ * └─ "rating"  ─────>  Les ventes des vendeurs avec le meilleur rating en premières.
+ * └─ "date-asc"  ───>  La date croissante. Les ventes les plus veilles en premières.
+ * └─ "date-desc"  ──>  La date décroissante. Les ventes les plus récentes en premières.
+ * @param {Array<Object>} sells - La liste des dictionnaires des ventes.
+ * @param {string} type - Le type de la vente.
+ */
+function sort(sells, type) {
+  const sorted = sells.slice();
+  
+  switch(type) {
+    case "price-asc":
+      return sorted.sort((a, b) => a.price - b.price);
+    
+    case "price-desc":
+      return sorted.sort((a, b) => b.price - a.price);
+    
+    case "rating":
+      return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    
+    case "date-asc":
+      return sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    case "date-desc":
+      return sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    default:
+      return sorted;
+  }
+}
 
 
 
@@ -138,4 +172,5 @@ module.exports = {
     hashString: hashString,
     renderDateToString: renderDateToString,
     search: search,
+    sort: sort,
 }

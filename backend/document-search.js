@@ -167,7 +167,7 @@ function documentSort(input, docList) {
       for (let k=0; k<docFiltered[j].length; k+=1) {
         // 0.8 est enfait la valeur de similarité qu'on trouve suffisante pour
         // considérer 2 mots comme simillaires ou prouches
-        if (similarity(inputFiltered[i],docFiltered[j][k])<0.8) {
+        if (similarity(inputFiltered[i],docFiltered[j][k])>0.8) {
           countList[1][j]+=1; // le nombre d'occurence d'un mot(ou un parent) dans un doc spécifique
         }
       }
@@ -180,7 +180,7 @@ function documentSort(input, docList) {
     for (let j=0; j<docFiltered.length; j+=1) {
       for (let l=0; l<docFiltered[j].length; l+=1) {
         // si les mots sont suffisament similaires, on calcule le poids
-        if (similarity(inputFiltered[i],docFiltered[j][l])<0.8) {
+        if (similarity(inputFiltered[i],docFiltered[j][l])>0.8) {
           const x=1 + (countList[1][j] / docFiltered[j].length);
           const TF=Math.log10(x);
 
@@ -200,15 +200,9 @@ function documentSort(input, docList) {
   paired.sort((a, b) => b[1] - a[1]);
   const sortedDocs = paired.map(pair => pair[0]);
   
-  return [sortedDocs, inputFiltered, docFiltered, weightList]
+  return sortedDocs
 }
 
-
-// let string1 = "J'ai mangé des saucisses à la compote et maintenant j'ai mal au ventre aie !"
-// let string2 = "Les saucisses de l'archiduchesse sont-elles sèches ? Archisèches !"
-// let string3 = "Ma compote de poire pue le caca boudin."
-// let string4 = "Les compotes de pommes sont-elles une opération extraterrestre pour pourrire nos dents ?"
-
-// let stringList = [string2, string3, string4]
-
-// console.log(documentSort(string1, stringList));
+module.exports = {
+  documentSort: documentSort
+}

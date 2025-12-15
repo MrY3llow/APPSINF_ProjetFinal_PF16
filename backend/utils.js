@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { documentSort } = require('./document-search.js');
 
 /**
  * Convertis un string en hash (sha256)
@@ -63,7 +64,78 @@ function renderDateToString(date, format="short", clock=true) {
   }
 }
 
+/**
+ * Fonction de recherche d'un input dans une liste de vente. L'input peut être une suite de mots, des nombres, ...
+ * Utilisé dans la page d'acceuil pour recherche un terme parmis les ventes disponibles.
+ * @param {Array<Object>} sells - Liste des dictionnaires des ventes.
+ * @param {string} input - Le terme de recherche.
+ */
+function search(sells, input) {
+
+  /**
+   * Convertis un dictionnaire d'une vente en un string.
+   * Utilisé pour la fonction de recherche.
+   * @param {Object} sell - Dictionnaire de la vente.
+   * @return {string} Un string contenant les valeurs du dictionnaires pour toutes les clés, sauf pour les clés "image", "buyers" et "_id".
+   */
+  function convertSellToString(sell) {
+    let result = "";
+    
+    for (let key in sell) {
+      if (key !== "image" && key !== "buyers" && key !== "_id") {
+        if (result !== "") {
+          result += " | ";
+        }
+        result += sell[key];
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Changer l'ordre d'une liste de vente sur base d'une liste de vente en format String.
+   * L'ordre des dictionnaires des ventes est réorganiser sur bases du même ordre des ventes
+   * en format String généré par la fonction convertSellToString(sell).
+   * @param {Array<Object>} sells - La liste de dictionnaire des ventes
+   * @param {Array<string>} sellsString - La liste des String des ventes (généré par la fonction convertSellToString(sell))
+   * @return {Array<Ovject>} La listes de dictionnaire de ventes de bases avec le bon ordre.
+   */
+  function orderSellsBaseOnString(sells, sellsString) {
+    let result = []
+    for (let sellString of sellsString) {
+      for (let sell of sells) {
+        if (sellString == convertSellToString(sell)) {
+          result.push(sell);
+        }
+      }
+    }
+    return result;
+  }
+
+
+  // Convertions des ventes en String.
+  let sellsString = [];
+  for (let sell of sells) {
+    sellsString.push(convertSellToString(sell));
+  }
+
+  // Recherche dans la liste des string
+  sellsStringSearched = documentSort(input, sellsString)
+
+  // Réorganisation des ventes sur bases des String recherché et donc réorganisé.
+  sellsSearched = orderSellsBaseOnString(sells, sellsStringSearched)
+  
+  
+  return sellsSearched
+}
+
+
+
+
+
+
 module.exports = {
     hashString: hashString,
     renderDateToString: renderDateToString,
+    search: search,
 }

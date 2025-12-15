@@ -1,5 +1,4 @@
 const utils = require('./utils.js');
-const { documentSearch } = require('./document-search.js');
 const ObjectId = require('mongodb').ObjectId;
 
 

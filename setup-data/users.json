@@ -3,12 +3,9 @@
     "username": "Johnny",
     "passwordHash": "hashed_password_here",
     "fullname": "John Doe",
-    "email": "johnny@test.com"
-  },
-  {
-    "username": "Alice",
-    "passwordHash": "hashed_password_here",
-    "fullname": "Alice Wonder",
-    "email": "alice@test.com"
+    "email": "johnny@test.com",
+    "points": 10,
+    "balance": 300,
+    "rankingAverage": 3
   }
 ]

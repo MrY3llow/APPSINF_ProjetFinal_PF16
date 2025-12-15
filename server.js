@@ -311,7 +311,7 @@ async function main() {
 
       // Mettre à jour la photo de profil dans la base de données
       try {
-        db.user.changeUserPhoto(dbo, req.session.username, imageData);
+        await db.user.changeUserPhoto(dbo, req.session.username, imageData);
         
         res.json({ success: true, message: "Photo de profil mise à jour avec succès" });
       } catch (err) {
@@ -329,7 +329,7 @@ async function main() {
       }
 
       let amount = Number(req.params.value);
-      db.user.addBalance(dbo, req.session.username, amount);
+      await db.user.addBalance(dbo, req.session.username, amount);
       res.redirect('/profile');
     });
 
@@ -507,12 +507,12 @@ async function main() {
     });
 
     // Post BUY PRODUCT
-    app.post('/sell/:id/buy', (req, res) => {
+    app.post('/sell/:id/buy', async function (req, res) {
       const sellId = req.params.id;
       const username = req.session.username;
 
       try {
-        db.sells.buy(dbo, new ObjectId(sellId), username)
+        await db.sells.buy(dbo, new ObjectId(sellId), username)
       } catch (err) {
         let error = "";
         if (err.message == "La vente n'est pas achetable.") {
@@ -534,17 +534,14 @@ async function main() {
     });
 
 
-
-    
-
     // Post RATE PRODUCT
-    app.post('/rating/:id/:rating', (req, res) => {
+    app.post('/rating/:id/:rating', async function(req, res) {
       const sellId = req.params.id;
       const rating = req.params.rating;
       const username = req.session.username;
 
       try {
-        db.sells.rate(dbo, new ObjectId(sellId), username, rating)
+        await db.sells.rate(dbo, new ObjectId(sellId), username, rating)
       } catch (err) {
         console.error(err);
       }
@@ -610,49 +607,42 @@ async function main() {
       }
     });
 
-    app.post('/profile/PasswordChange', async function(req, res) {
-      const username = req.session.username;
-      const newPassword = req.body.newPassword;
-      const copyNewPassword = req.body.copyNewPassword;
+  app.post('/profile/PasswordChange', async function(req, res) {
+    const username = req.session.username;
+    const newPassword = req.body.newPassword;
+    const copyNewPassword = req.body.copyNewPassword;
 
-      let error = "";
+    let error;
 
-      // Vérification des conditions
-      if (newPassword != copyNewPassword) { // Est-ce que les deux password complété correspondent
-        error += "Les deux mots de passe ne correspondent pas.\n"
-      } 
-      else if (!checkUserInput.isValidPassword(newPassword)) {  // Est-ce que le mot de passe est valide
-        error += "Le mot de passe n'est pas valide. Il doit :\n- faire plus de 8 caractères"
-      }
+    // Vérification des conditions
+    if (newPassword != copyNewPassword) {
+      error = "Les deux mots de passe ne correspondent pas"
+    } 
+    else if (!checkUserInput.isValidPassword(newPassword)) {
+      error = "Le mot de passe n'est pas valide. Il doit faire plus de 8 caractères"
+    }
 
-      if (!error) {
-        try {
-          await db.user.changePassword(dbo, username, newPassword);
-        } catch (err) {
-          console.error(err);
-          error += "Une erreur est survenue avec la base de données.\n"
-        }
-      }
+    if (error) {
+      // Retourne une erreur 400 avec le message d'erreur
+      return res.status(400).json({ error: error });
+    }
 
-      if (error) {
-        res.render("layout", {
-          title: "Inscription",
-          page: "pages/profile",
-          username: req.session.username,
-          user: await db.user.getUserFromUsername(dbo, req.session.username),
-          error: error,
-        })
-      } else {
-        res.redirect('/profile');
-      }
-    }); 
+    try {
+      await db.user.changePassword(dbo, username, newPassword);
+      // Retourne un statut succès avec un message de confirmation
+      return res.status(200).json({ message: "Mot de passe changé avec succès ✅" });
+    } catch (err) {
+      console.error(err);
+      // Erreur serveur
+      return res.status(500).json({ error: "Une erreur est survenue avec la base de données" });
+    }
+  });
 
 
-
-    // // Page inexistante, redirection vers la page principale
-    // app.use((req, res) => {
-    //   res.redirect("/");
-    // });
+    // Page inexistante, redirection vers la page principale
+    app.use((req, res) => {
+      res.redirect("/");
+    });
 
 
 

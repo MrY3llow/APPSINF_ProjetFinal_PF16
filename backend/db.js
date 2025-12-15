@@ -424,8 +424,8 @@ getReviewAverage = async function (dbo, username) {
 
   for (const sell of sells) {
     for (const buyer of sell.buyers) {
-      if (typeof buyer.rating === 'number') {
-        total += buyer.rating;
+      if (buyer.rating !== 'null') {
+        total += Number(buyer.rating);
         count += 1;
       }
     }
@@ -443,4 +443,5 @@ module.exports = {
   user: user,
   sells: sells,
   leaderboard: leaderboard,
+  getReviewAverage: getReviewAverage,
 }

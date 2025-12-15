@@ -261,20 +261,25 @@ async function main() {
 
     // Get PROFILE
     app.get('/profile', async function(req, res) {
-      if(req.session.username == undefined) {
-        req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son profile.";
+      if (!req.session.username) {
+        req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son profil.";
         req.session.previousPageBeforeLoginPage = '/profile';
-        res.redirect('/login');
+        return res.redirect('/login');
       }
-      else {
-        res.render("layout", {
-          title: "Inscription",
-          page: "pages/profile",
-          username: req.session.username,
-          user: await db.user.getUserFromUsername(dbo, req.session.username),
-          error: undefined,
-        })
-      }
+
+      const username = req.session.username;
+
+      const user = await db.user.getUserFromUsername(dbo, username);
+      const reviewAverage = await db.getReviewAverage(dbo, username);
+
+      res.render("layout", {
+        title: "Profil",
+        page: "pages/profile",
+        username: username,
+        user: user,
+        reviewAverage: reviewAverage,
+        error: undefined,
+      });
     });
 
     // POST pour mettre à jour la photo de profile

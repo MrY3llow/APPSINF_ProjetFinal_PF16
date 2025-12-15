@@ -7,7 +7,7 @@
 
     <!-- Affiche les achats en utilisant le modèle -->
     <% for (let sell of sells) { %>
-      <%- include('../partials/product-card', {sell: sell, origin: "purchase-history"}) %>
+      <%- include('../partials/product-card', {sell: sell, username: username, origin: "purchase-history"}) %>
     <% } %>
 
     <!-- Si aucun achat -->

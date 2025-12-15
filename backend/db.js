@@ -163,6 +163,26 @@ const sells = {
     }
   },
 
+  /**
+   * Ajoute une review dans la base de donnée.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {Object} id - L'id de la vente
+   * @param {string} username - le nom de l'utilisateur qui achète.
+   * @param {number} rating - Le rating entre 1 et 5
+   */
+  rate: async function (dbo, id, username, rating) {
+    const result = await dbo.collection('sells').updateOne(
+      { 
+        _id: id,
+        "buyers.username": username
+      },
+      { 
+        $set: { 'buyers.$.rating': rating }
+      }
+    );
+  }
+
 
 }
 
@@ -342,24 +362,25 @@ const user = {
       { username: username },
       { $inc: { balance: amount } }
     )
-  }
+  },
+
+
+  /**
+   * Change le mot de passe d'un utilisateur
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   * @param {string} newPassword - Le nouveau mot de passe en clair
+   */
+  changePassword : async function(dbo, username, newPassword) {
+    const hashedPassword = utils.hashString(newPassword);
+    await dbo.collection('users').updateOne(
+      { username: username },
+      { $set: { passwordHash: hashedPassword } }
+    );
+  },
 
 }
-
-/**
- * Change le mot de passe d'un utilisateur
- * @async
- * @param {Object} dbo - L'objet de la base de donnée MongoDB
- * @param {string} username - Le nom d'utilisateur
- * @param {string} newPassword - Le nouveau mot de passe en clair
- */
-user.changePassword = async function(dbo, username, newPassword) {
-  const hashedPassword = utils.hashString(newPassword);
-  await dbo.collection('users').updateOne(
-    { username: username },
-    { $set: { passwordHash: hashedPassword } }
-  );
-};
 
 
 

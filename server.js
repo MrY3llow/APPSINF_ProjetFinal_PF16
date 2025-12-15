@@ -106,7 +106,11 @@ async function main() {
     })
 
 
-
+    // Get LOGOUT
+    app.get('/logout', function(req, res) {
+      req.session.username = undefined;
+      res.redirect('/');
+    });
 
 
     // Get LOGIN 
@@ -225,12 +229,76 @@ async function main() {
 
     // Get PROFILE
     app.get('/profile', async function(req, res) {
-      res.render("layout", {
-        title: "Inscription",
-        page: "pages/profile",
-        username: req.session.username,
-        error: undefined,
-      })
+      if(req.session.username == undefined) {
+        req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son profile.";
+        req.session.previousPageBeforeLoginPage = '/profile';
+        res.redirect('/login');
+      }
+      else {
+        res.render("layout", {
+          title: "Inscription",
+          page: "pages/profile",
+          username: req.session.username,
+          user: await db.user.getUserFromUsername(dbo, req.session.username),
+          error: undefined,
+        })
+      }
+    });
+
+    // POST pour mettre à jour la photo de profile
+    app.post('/profile/updateImage', upload.single('image'), async function(req, res) {
+      // Vérifier si l'utilisateur est connecté
+      if (!req.session.username) {
+        return res.status(401).json({ error: "Non authentifié" });
+      }
+
+      let error = "";
+
+      // Récupérer l'image uploadée
+      let imageData = null;
+      if (req.file) {
+        imageData = {
+          contentType: req.file.mimetype, // 'image/jpeg', 'image/png', etc.
+          data: req.file.buffer.toString('base64'), // Conversion en Base64
+          size: req.file.size,
+          filename: req.file.originalname
+        };
+      }
+
+      // Vérification des conditions
+      if (!req.file) {
+        error += "Une image est requise.\n";
+      }
+      else if (req.file.size > 5 * 1024 * 1024) {
+        error += "L'image ne doit pas dépasser 5 MB.\n";
+      }
+
+      if (error) {
+        return res.status(400).json({ error: error });
+      }
+
+      // Mettre à jour la photo de profil dans la base de données
+      try {
+        db.user.changeUserPhoto(dbo, req.session.username, imageData);
+        
+        res.json({ success: true, message: "Photo de profil mise à jour avec succès" });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Une erreur est survenue avec la base de données" });
+      }
+    });
+
+
+    // Post Ajout de fonds
+    app.post('/profile/addBalance/:value', async function(req, res) {
+      // Vérifier si l'utilisateur est connecté
+      if (!req.session.username) {
+        return res.status(401).json({ error: "Non authentifié" });
+      }
+
+      let amount = Number(req.params.value);
+      db.user.addBalance(dbo, req.session.username, amount);
+      res.redirect('/profile');
     });
 
 
@@ -266,7 +334,7 @@ async function main() {
       let price = req.body.price;
       let quantity = req.body.quantity;
       let category = req.body.category;
-      let filter = req.body.filter;
+      let filterInput = req.body.filter;
       let address = req.body.address;
 
       let error = "";
@@ -311,6 +379,10 @@ async function main() {
         error += "La quantité doit être un nombre positif sans virgule.\n"
       }
 
+      if (!category) {
+        error += "Une catégorie doit être choisie.\n"
+      }
+
       if(!error) { // Si pas d'erreur, tentative de création de l'élément dans la base de donnée.
         try {
           await db.sells.create(dbo, {
@@ -322,7 +394,7 @@ async function main() {
             category: category,
             address: address,
             image: imageData,
-            filter: filter,
+            filter: filterInput,
           })
         } catch (err) {
           console.error(err);
@@ -357,16 +429,19 @@ async function main() {
         title: "Leaderboard", // Titre qui est affiché dans l'onglet du naviguateur chrome
         page: "pages/leaderboard",
         username: req.session.username,
+        leaderboard: await db.leaderboard.getFirst(dbo),
       })
     });
 
 
     // Get PURCHASE HISTORY
     app.get('/purchase-history', async function(req, res) {
+      const sells = await db.user.getSellHistory(dbo, req.session.username);
       res.render("layout", {
         title: "Historique d'achat", // Titre qui est affiché dans l'onglet du naviguateur chrome
         page: "pages/purchase-history",
         username: req.session.username,
+        sells: sells,
       })
     });
 
@@ -405,7 +480,6 @@ async function main() {
     app.post('/sell/:id/buy', (req, res) => {
       const sellId = req.params.id;
       const username = req.session.username;
-      console.log(username);
 
       try {
         db.sells.buy(dbo, new ObjectId(sellId), username)
@@ -431,6 +505,22 @@ async function main() {
 
 
 
+    
+
+    // Post RATE PRODUCT
+    app.post('/rating/:id/:rating', (req, res) => {
+      const sellId = req.params.id;
+      const rating = req.params.rating;
+      const username = req.session.username;
+
+      try {
+        db.sells.rate(dbo, new ObjectId(sellId), username, rating)
+      } catch (err) {
+        console.error(err);
+      }
+      res.redirect('/purchase-history');
+
+    });
 
 
     // Get une image de vente
@@ -459,30 +549,36 @@ async function main() {
     });
 
     // Get une photo de profile
-    app.get('/image/profile/:username', async function(req, res) {
+    app.get('/image/user/:username', async function(req, res) {
       try {
         const username = req.params.username;
         
         // Récupérer l'utilisateur depuis la base de données
-        const profile = await dbo.collection('sells').findOne({ username: username });
-        
-        if (!sell || !sell.image || !sell.image.data) {
-          return res.status(404).send('Image non trouvée'); // Erreur lorsque l'image n'est pas trouvée, ou qu'elle n'existe pas.
+        const profile = await db.user.getUserFromUsername(dbo, username);
+
+        // Erreur lorsque l'image n'est pas trouvée, ou qu'elle n'existe pas.
+        if (!profile) { 
+          return res.status(404).send('Image non trouvée'); 
+        }
+
+        // Si l'utilisateur n'a pas d'image, retourner l'image par défaut
+        else if (!profile.photo || !profile.photo.data) {
+          return res.sendFile(path.join(__dirname, 'static', 'defaultUserProfile.png'));
         }
         
         // Converti l'image de Base64 à Buffer ()
-        const imageBuffer = Buffer.from(sell.image.data, 'base64');
+        const imageBuffer = Buffer.from(profile.photo.data, 'base64');
         
         // Définir le type de contenu
-        res.set('Content-Type', sell.image.contentType); // On envoit le même type de contenu que le type de l'image
+        res.set('Content-Type', profile.photo.contentType);
         res.send(imageBuffer);
         
       } catch (err) {
         console.error('Erreur lors de la récupération de l\'image:', err);
-        res.status(500).send('Erreur serveur');
+        // En cas d'erreur serveur, retourner aussi l'image par défaut
+        res.sendFile(path.join(__dirname, 'static', 'defaultUserProfile.png'));
       }
     });
-
 
 
 

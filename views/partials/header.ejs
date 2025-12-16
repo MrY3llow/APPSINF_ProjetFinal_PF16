@@ -25,7 +25,7 @@
         <% } %>
         <a href="/annonce-creation" class="nav-link btn btn-outline">Créer une vente</a>
         <% if(username != undefined) { %>
-          <span class="user-balance">0.00 $</span>
+          <span class="user-balance"><%= userBalance.toFixed(2) %> $</span>
           <a href="/profile" class="profile-link">
             <img src="/image/user/<%= username %>" alt="Photo de profil" class="header-profile-photo">
           </a>

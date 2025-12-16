@@ -10,61 +10,213 @@
     <% if (sell.image) { %>
       <img src="/image/sell/<%= sell._id %>" alt="<%= sell.title %>" class="productPage-image">
     <% } %>
-    <h2 class="card-title"><%= sell.title %></h2>
-    <p class="card-subtitle">Description : <%= sell.description %></p>    
 
-    <% if (sell.filter && typeof sell.filter === 'object') { %>
-      <%
-        let entries = Object.entries(sell.filter);
-        entries = entries.filter(([key,value]) => value !== undefined && value !== null);
 
-        if (sell.category === 'Véhicule') {
-          for (let i=0; i<entries.length; i+=1) {
-            if (entries[i][0] == 'Nombre de roue') {
-              entries[i][1] += ' roues';
-            } else if (entries[i][0] == 'KilomÃ©trage') {
-              entries[i][1] += ' km';
-            } else if (entries[i][0] == 'AnnÃ©e') {
-              entries[i][1] = 'Années : ' + entries[i][1];
+    <% if (sell.owner != username) { %>
+        <!-- CODE DES PAGES CONSULTE PAR LES ACHETEURS (pas propriétaire de la vente) -->
+
+      <h2 class="card-title"><%= sell.title %></h2>
+      <p class="card-subtitle">Description : <%= sell.description %></p>
+
+      <% if (sell.filter && typeof sell.filter === 'object') { %>
+        <%
+          let entries = Object.entries(sell.filter);
+          entries = entries.filter(([key,value]) => value !== undefined && value !== null);
+
+          if (sell.category === 'Véhicule') {
+            for (let i=0; i<entries.length; i+=1) {
+              if (entries[i][0] == 'Nombre de roue') {
+                entries[i][1] += ' roues';
+              } else if (entries[i][0] == 'Kilométrage') {
+                entries[i][1] += ' km';
+              } else if (entries[i][0] == 'Année') {
+                entries[i][1] = 'Années : ' + entries[i][1];
+              }
             }
           }
-        }
-      %>
-      <p class="card-subtitle">
-        Filtres : <%= sell.category %> , <%= entries.map(e => e[1]).join(', ') %>
-      </p>
-    <% } %>
-
-
-    
-    <p class="card-subtitle">Stock : <%= sell.quantity %></p>
-    <p class="product-price"><%= sell.price %> €</p>    
-
-
-    <!-- BUTTON >   Acheter -->
-    <div class="actions">
-      <%
-      productNotAvailableText = "";
-      if (sell.quantity <= 0) { productNotAvailableText += "Le produit n'est plus en stock.\n" }
-      else if (!username) { productNotAvailableText += "Connectez vous pour acheter.\n" } 
-      else if (username == sell.owner) { productNotAvailableText += "Vous ne pouvez pas acheter votre propre produit.\n" }%>
-
-      <% if (productNotAvailableText) {%>
-        <button class="btn" type="submit" disabled>Acheter le produit</button>
-        <p class="product-not-available-text"><%- productNotAvailableText.replace(/\n/g, '<br>') %></p>
-      <% } else { %>
-        <form method="POST" action="/sell/<%= sell._id %>/buy">
-          <button class="btn" type="submit">Acheter le produit</button>
-        </form>
+        %>
+        <p class="card-subtitle">
+          Filtres : <%= sell.category %> , <%= entries.map(e => e[1]).join(', ') %>
+        </p>
       <% } %>
-    </div>
 
-    <!-- Message d'erreur qui s'affiche s'il existe -->
-    <% if (error) { %>
-      <div class="error-message">
-        <p><%- error.replace(/\n/g, '<br>') %></p>
+
+      
+      <p class="card-subtitle">Stock : <%= sell.quantity %></p>
+      <p class="product-price"><%= sell.price %> €</p>    
+
+
+      <!-- BUTTON >   Acheter -->
+      <div class="actions">
+        <%
+        productNotAvailableText = "";
+        if (sell.quantity <= 0) { productNotAvailableText += "Le produit n'est plus en stock.\n" }
+        else if (!username) { productNotAvailableText += "Connectez vous pour acheter ou moddifier une vente.\n" } 
+        else if (username == sell.owner) { productNotAvailableText += "Vous ne pouvez pas acheter votre propre produit.\n" }%>
+
+        <% if (productNotAvailableText) {%>
+          <button class="btn" type="submit" disabled>Acheter le produit</button>
+          <p class="product-not-available-text"><%- productNotAvailableText.replace(/\n/g, '<br>') %></p>
+        <% } else { %>
+          <form method="POST" action="/sell/<%= sell._id %>/buy">
+            <button class="btn" type="submit">Acheter le produit</button>
+          </form>
+        <% } %>
       </div>
-    <% } %>
+    <% } else { %>
+
+      <!-- CODE CONSULTER PAR LES PROPRIETAIRE DE LA VENTE (pour moddifier une vente) -->
+      <form class="form" method="POST" action="/product/<%= sell._id %>/update">
+
+      <!-- Message d'erreur qui s'affiche s'il existe -->
+      <% if (error) { %>
+        <div class="error-message">
+          <p><%- error.replace(/\n/g, '<br>') %></p>
+        </div>
+      <% } %>
+
+      <!-- INPUT >   Title -->
+      <div class="field">
+        <label for="title" class="label">Titre <span class="required">*</span></label>
+        <input id="title" type="text" name="title" class="input" placeholder="Titre de la vente" value="<%= titleInput %>">
+      </div>
+
+      <!-- INPUT >   Description -->
+      <div class="field">
+        <label for="description" class="label">Description <span class="required">*</span></label>
+        <textarea id="description" name="description" class="input input-area" placeholder="Description de la vente"><%= descriptionInput %></textarea>
+      </div>
+            
+      <!-- INPUT >   Adresse -->
+      <div class="field">
+        <label for="address" class="label">Address <span class="required">*</span></label>
+        <input id="address" type="text" name="address" class="input" placeholder="Adresse" value="<%= addressInput %>">
+      </div>
+
+      <!-- INPUT >   Prix -->
+      <div class="field">
+        <label for="price" class="label">Prix <span class="required">*</span></label>
+        <input id="price" type="number" name="price" class="input" placeholder="Prix" value="<%= priceInput %>" min="0.01" step="0.01">
+      </div>
+
+      <!-- INPUT >   Quantité -->
+      <div class="field">
+        <label for="quantity" class="label">Quantité <span class="required">*</span></label>
+        <input id="quantity" type="number" name="quantity" class="input" placeholder="Quantité" value="<%= quantityInput %>" min="1" step="1">
+      </div>
+
+      <!-- SELECT >   Catégorie -->
+      <div class="field">
+        <label for="category" class="label">Catégorie <span class="required">*</span></label>
+        <select id="category" name="category" class="input">
+          <option value="" disabled <% if (!categoryInput) { %> selected <% } %>> Sélectionnez une catégorie</option>
+          <% for(let categoryName in categoryData) { %>
+              <option value="<%= categoryName %>" <% if (categoryInput == categoryName) { %> selected <% } %> ><%= categoryName %></option>
+          <% } %>
+        </select>
+      </div>
+
+      <!-- Zone dynamique pour les filtres spécifiques -->
+      <div id="dynamic-fields"></div>
+      
+      <!-- BUTTON >   Envoyer le formulaire -->
+      <div class="actions">
+        <button class="btn" type="submit">Mettre à jour la vente</button>
+      </div>
+
+    </form>
+
+    <% }%>
 
   </section>
+
+  <script>
+    const categoryData = <%- JSON.stringify(categoryData) %>;
+    const filterInput = <%- JSON.stringify(sell.filter || {}) %>;
+
+    // Fonction pour créer les champs dynamiques
+    function updateDynamicFields(category) {
+      const container = document.getElementById('dynamic-fields');
+      container.innerHTML = ''; // Vider les champs précédents
+
+      // Si aucune catégorie n'est sélectionnée (ou que c'est une erreur),
+      // alors rien n'est affiché.
+      if (!category || !categoryData[category]) {
+        return;
+      }
+
+      // Créer des inputs pour chaque filtre de la catégorie
+      categoryData[category].forEach(filter => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'field';
+
+        const label = document.createElement('label');
+        label.className = 'label';
+        
+        label.textContent = filter.name;
+        const fieldId = `filter_${filter.name}`;
+        label.setAttribute('for', fieldId);
+
+        let input;
+
+        if (filter.type === 'select') { // Si l'input est une sélection de valeurs
+          input = document.createElement('select');
+          input.className = 'input';
+          input.id = fieldId;
+          input.name = `filter[${filter.name}]`;
+
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = `Sélectionnez ${filter.name.toLowerCase()}`;
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          input.appendChild(defaultOption);
+
+          filter.values.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            
+            // Pré-sélectionner si la valeur correspond à filterInput
+            if (filterInput[filter.name] && filterInput[filter.name] === value) {
+              option.selected = true;
+              defaultOption.selected = false;
+            }
+            
+            input.appendChild(option);
+          });
+
+        } else if (filter.type === 'number') {
+          input = document.createElement('input');
+          input.type = 'number';
+          input.className = 'input';
+          input.id = fieldId;
+          input.name = `filter[${filter.name}]`;
+          input.placeholder = filter.name;
+          input.min = '0';
+          
+          // Pré-remplir la valeur si elle existe dans filterInput
+          if (filterInput[filter.name]) {
+            input.value = filterInput[filter.name];
+          }
+        }
+
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        container.appendChild(fieldDiv);
+      });
+    }
+
+    // Écouteur d'événement sur le changement de catégorie
+    document.getElementById('category').addEventListener('change', function(e) {
+      updateDynamicFields(e.target.value);
+    });
+
+    // Initialiser les champs si une catégorie est déjà sélectionnée
+    const selectedCategory = document.getElementById('category').value;
+    if (selectedCategory) {
+      updateDynamicFields(selectedCategory);
+    }
+  </script>
+
 </main>

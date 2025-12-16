@@ -282,22 +282,9 @@ async function main() {
           user: await db.user.getUserFromUsername(dbo, req.session.username),
           error: undefined,
           userBalance: await db.user.getBalance(dbo, req.session.username),
+          reviewAverage: await db.user.getReviewAverage(dbo, req.session.username),
         })
-      }
-
-      const username = req.session.username;
-
-      const user = await db.user.getUserFromUsername(dbo, username);
-      const reviewAverage = await db.user.getReviewAverage(dbo, username);
-
-      res.render("layout", {
-        title: "Profil",
-        page: "pages/profile",
-        username: username,
-        user: user,
-        reviewAverage: reviewAverage,
-        error: undefined,
-      });
+      };
     });
 
     // POST pour mettre à jour la photo de profile
@@ -316,7 +303,8 @@ async function main() {
           contentType: req.file.mimetype, // 'image/jpeg', 'image/png', etc.
           data: req.file.buffer.toString('base64'), // Conversion en Base64
           size: req.file.size,
-          filename: req.file.originalname
+          filename: req.file.originalname,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         };
       }
 
@@ -353,7 +341,6 @@ async function main() {
 
       let amount = Number(req.params.value);
       let balance = await db.user.getBalance(dbo, req.session.username);
-      console.log(balance);
       if (balance + amount < 0) {
         amount = -balance;
       }
@@ -444,6 +431,7 @@ async function main() {
             image: imageData,
             filter: filterInput,
             date: new Date(),
+            userBalance: await db.user.getBalance(dbo, req.session.username),
           })
         } catch (err) {
           console.error(err);
@@ -532,6 +520,7 @@ async function main() {
         categoryInput: sell.category,
         filterInput: sell.filter,
         addressInput: sell.address,
+        userBalance: await db.user.getBalance(dbo, req.session.username),
       })
     });
 
@@ -627,6 +616,8 @@ async function main() {
           categoryInput: sell.category,
           filterInput: sell.filter,
           addressInput: sell.address,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
+
         })
       } else { // Aucune erreur, alors charge la page du produit
         res.redirect("/sale-history");

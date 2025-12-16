@@ -431,7 +431,6 @@ async function main() {
             image: imageData,
             filter: filterInput,
             date: new Date(),
-            userBalance: await db.user.getBalance(dbo, req.session.username),
           })
         } catch (err) {
           console.error(err);

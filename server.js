@@ -545,6 +545,7 @@ async function main() {
           sell: sell,
           error: error,
           userBalance: await db.user.getBalance(dbo, req.session.username),
+          categoryData: filter.categoryData,
         })
         return;
       }

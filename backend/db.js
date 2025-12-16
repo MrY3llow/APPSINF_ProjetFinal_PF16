@@ -85,7 +85,7 @@ const sells = {
     options.quantity = Number(options.quantity);
     await dbo.collection('sells').insertOne(options);
     
-    await this.addPoints(dbo, options.owner, 25);
+    await user.addPoints(dbo, options.owner, 25);
   },
 
   /**
@@ -203,8 +203,8 @@ const sells = {
       // Fait payer l'utilisateur
       await user.pay(dbo, username, sell.owner, sell.price);
       
-      await this.addPoints(dbo, username, 75);
-      await this.addPoints(dbo, sell.owner, 100);
+      await user.addPoints(dbo, username, 75);
+      await user.addPoints(dbo, sell.owner, 100);
 
     } else {
       throw new Error(`La vente n'est pas achetable.`);
@@ -232,22 +232,22 @@ const sells = {
     } catch (err) {
         throw err;
       }
-      await this.addPoints(dbo, username, 25);
+      await sells.addPoints(dbo, username, 25);
       
       let sell = await dbo.collection('users').findOne({ _id: id});
       let sellOwner = sell.owner;
 
       if (rating ==5 ) {
-        await this.addPoints(dbo, sellOwner, 50);
+        await user.addPoints(dbo, sellOwner, 50);
       }
       if (rating ==4 ) {
-        await this.addPoints(dbo, sellOwner, 40);
+        await user.addPoints(dbo, sellOwner, 40);
       }
       if (rating ==3 ) {
-        await this.addPoints(dbo, sellOwner, 30);
+        await user.addPoints(dbo, sellOwner, 30);
       }
       if (rating ==1 ) {
-        await this.addPoints(dbo, sellOwner, -10);
+        await user.addPoints(dbo, sellOwner, -10);
       }
   },
 

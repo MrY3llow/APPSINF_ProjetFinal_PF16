@@ -84,6 +84,8 @@ const sells = {
     options.price = Number(options.price);
     options.quantity = Number(options.quantity);
     await dbo.collection('sells').insertOne(options);
+    
+    await this.addPoints(dbo, options.owner, 25);
   },
 
   /**
@@ -200,6 +202,10 @@ const sells = {
       );
       // Fait payer l'utilisateur
       await user.pay(dbo, username, sell.owner, sell.price);
+      
+      await this.addPoints(dbo, username, 75);
+      await this.addPoints(dbo, sell.owner, 100);
+
     } else {
       throw new Error(`La vente n'est pas achetable.`);
     }
@@ -214,17 +220,36 @@ const sells = {
    * @param {number} rating - Le rating entre 1 et 5
    */
   rate: async function (dbo, id, username, rating) {
-    const result = await dbo.collection('sells').updateOne(
-      { 
-        _id: id,
-        "buyers.username": username
-      },
-      { 
-        $set: { 'buyers.$.rating': rating }
+    try {
+      const result = await dbo.collection('sells').updateOne(
+        { 
+          _id: id,
+          "buyers.username": username,
+        },
+        { 
+          $set: { 'buyers.$.rating': rating }
+        })
+    } catch (err) {
+        throw err;
       }
-    );
-  },
+      await this.addPoints(dbo, username, 25);
+      
+      let sell = await dbo.collection('users').findOne({ _id: id});
+      let sellOwner = sell.owner;
 
+      if (rating ==5 ) {
+        await this.addPoints(dbo, sellOwner, 50);
+      }
+      if (rating ==4 ) {
+        await this.addPoints(dbo, sellOwner, 40);
+      }
+      if (rating ==3 ) {
+        await this.addPoints(dbo, sellOwner, 30);
+      }
+      if (rating ==1 ) {
+        await this.addPoints(dbo, sellOwner, -10);
+      }
+  },
 
 }
 
@@ -374,6 +399,17 @@ const user = {
    */
   getPoints : async function (dbo, username) {
     return await dbo.collection('users').findOne({ username: username }).points;
+  },
+
+  /**
+   * Ajoute des points à un utilisateur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   * @param {number} add - Nombre de points à ajouter
+   */
+  addPoints: async function (dbo, username, add) {
+    const result = await dbo.collection('users').findOneAndUpdate({ username }, { $inc: { points: add } }, { returnDocument: 'after' });
   },
 
   

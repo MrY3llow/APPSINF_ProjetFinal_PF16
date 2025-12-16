@@ -65,6 +65,14 @@
       </div>
     <% } else { %>
 
+    <!-- BUTTON >   Acheter -->
+    <div class="actions">
+      <%
+      productNotAvailableText = "";
+      if (sell.quantity <= 0) { productNotAvailableText += "Le produit n'est plus en stock.\n" }
+      else if (!username) { productNotAvailableText += "Connectez vous pour acheter.\n" } 
+      else if (userBalance < sell.price) { productNotAvailableText += "Vous n'avez pas le montant suffisant.\n" } 
+      else if (username == sell.owner) { productNotAvailableText += "Vous ne pouvez pas acheter votre propre produit.\n" }%>
       <!-- CODE CONSULTER PAR LES PROPRIETAIRE DE LA VENTE (pour moddifier une vente) -->
       <form class="form" method="POST" action="/product/<%= sell._id %>/update">
 

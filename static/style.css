@@ -544,7 +544,6 @@ img{ max-width:100%; display:block; }
   flex-direction: column;
   position: sticky;
   top: 80px;
-  max-height: calc(100vh - 100px);
   overflow-y: auto;
 }
 

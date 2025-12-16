@@ -13,7 +13,8 @@
         <h2 class="profile-username"><%= user.username %></h2>
       </div>
       
-      <p class="profile-points">Points : <%= user.points %></p>
+      <p class="profile-points" id="points-line">Points : <%= user.points %></p>
+      <p class="hidden-message" id="hidden-message" style="display: none;">??? ??? Vol</p>
       <p class="profile-stars">
         Note moyenne :
         <% if (reviewAverage === null) { %>
@@ -154,6 +155,17 @@
     } catch (error) {
       console.error(error);
       alert('Erreur de connexion au serveur');
+    }
+  });
+
+
+  // Gestion du double-clic sur la ligne Points pour afficher le message caché
+  document.getElementById('points-line').addEventListener('dblclick', () => {
+    const hiddenMessage = document.getElementById('hidden-message');
+    if (hiddenMessage.style.display === 'none') {
+      hiddenMessage.style.display = 'block';
+    } else {
+      hiddenMessage.style.display = 'none';
     }
   });
   </script>

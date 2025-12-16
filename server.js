@@ -475,26 +475,40 @@ async function main() {
 
     // Get PURCHASE HISTORY
     app.get('/purchase-history', async function(req, res) {
-      const sells = await db.user.getPurchaseHistory(dbo, req.session.username);
-      res.render("layout", {
-        title: "Historique d'achat", // Titre qui est affiché dans l'onglet du naviguateur chrome
-        page: "pages/purchase-history",
-        username: req.session.username,
-        sells: sells,
-        userBalance: await db.user.getBalance(dbo, req.session.username),
-      })
+      if (!req.session.username) {
+        req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son historique d'achat.";
+        req.session.previousPageBeforeLoginPage = '/purchase-history';
+        res.redirect('/login');
+      }
+      
+      else {
+        const sells = await db.user.getPurchaseHistory(dbo, req.session.username);
+        res.render("layout", {
+          title: "Historique d'achat", // Titre qui est affiché dans l'onglet du naviguateur chrome
+          page: "pages/purchase-history",
+          username: req.session.username,
+          sells: sells,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
+        })}
     });
 
     // Get SALE HISTORY
     app.get('/sale-history', async function(req, res) {
-      const sells = await db.user.getSaleHistory(dbo, req.session.username);
-      res.render("layout", {
-        title: "Historique de vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
-        page: "pages/sale-history",
-        username: req.session.username,
-        sells: sells,
-        userBalance: await db.user.getBalance(dbo, req.session.username),
-      })
+      if (!req.session.username) {
+        req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son historique de vente.";
+        req.session.previousPageBeforeLoginPage = '/sale-history';
+        res.redirect('/login');
+      }
+      
+      else {
+        const sells = await db.user.getSaleHistory(dbo, req.session.username);
+        res.render("layout", {
+          title: "Historique de vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
+          page: "pages/sale-history",
+          username: req.session.username,
+          sells: sells,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
+      })}
     });
 
 
@@ -545,6 +559,7 @@ async function main() {
           sell: sell,
           error: error,
           userBalance: await db.user.getBalance(dbo, req.session.username),
+          categoryData: filter.categoryData,
         })
         return;
       }

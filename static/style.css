@@ -258,7 +258,15 @@ img{ max-width:100%; display:block; }
 /* style pour le changement de mdp dans profile */
 #change-password-btn {
   margin-top: 10px;
-  width: 10vw !important;
+  width: 100%;
+  max-width: 300px;
+}
+
+@media (max-width: 768px) {
+  #change-password-btn {
+    width: 100%;
+    max-width: none;
+  }
 }
 
 #change-password-field {
@@ -267,7 +275,8 @@ img{ max-width:100%; display:block; }
   padding: 12px; 
   margin-bottom: 4vh;
   margin-top: 2vh;
-  width: fit-content;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .card{
@@ -431,7 +440,8 @@ img{ max-width:100%; display:block; }
 }
 
 .input {
-    width: 500px;
+    width: 100%;
+    max-width: 500px;
 }
 
 .input-area {
@@ -544,7 +554,7 @@ img{ max-width:100%; display:block; }
   flex-direction: column;
   position: sticky;
   top: 80px;
-  overflow-y: auto;
+  height: fit-content;
 }
 
 .left-space .toolbox-inputs {

@@ -341,7 +341,6 @@ async function main() {
 
       let amount = Number(req.params.value);
       let balance = await db.user.getBalance(dbo, req.session.username);
-      console.log(balance);
       if (balance + amount < 0) {
         amount = -balance;
       }

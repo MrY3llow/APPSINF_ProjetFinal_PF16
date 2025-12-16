@@ -114,7 +114,7 @@ async function main() {
       
       // BARRE DE RECHERCHE
       let searchInput = req.query.search; // Input de la barre de recherche
-      if (searchInput == "leaderboardPassword") {
+      if (searchInput == "LouvainLeVol") {
         res.redirect('/leaderboard')
         return;
       }

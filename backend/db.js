@@ -110,7 +110,6 @@ const sells = {
    * });
    */
   update: async function(dbo, sellId, options) {
-    console.log(sellId, options)
     this.checkSellsOptions(options);
 
     // Convertis les nombres de String en Number si présents

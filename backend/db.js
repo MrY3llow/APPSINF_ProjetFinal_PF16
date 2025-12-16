@@ -232,9 +232,9 @@ const sells = {
     } catch (err) {
         throw err;
       }
-      await sells.addPoints(dbo, username, 25);
+      await user.addPoints(dbo, username, 25);
       
-      let sell = await dbo.collection('users').findOne({ _id: id});
+      let sell = await dbo.collection('sells').findOne({ _id: id});
       let sellOwner = sell.owner;
 
       if (rating ==5 ) {
@@ -409,7 +409,9 @@ const user = {
    * @param {number} add - Nombre de points à ajouter
    */
   addPoints: async function (dbo, username, add) {
-    const result = await dbo.collection('users').findOneAndUpdate({ username }, { $inc: { points: add } }, { returnDocument: 'after' });
+    await dbo.collection('users').updateOne(
+      {username : username }, 
+      { $inc: { points: add } });
   },
 
   

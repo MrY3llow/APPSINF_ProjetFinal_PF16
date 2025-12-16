@@ -87,6 +87,46 @@ const sells = {
   },
 
   /**
+   * Met à jour une vente existante dans la base de données.
+   * Seuls les champs fournis seront mis à jour.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {ObjectId} sellId - L'identifiant de la vente à mettre à jour
+   * @param {Object} options - Les options de mise à jour. Dictionnaire
+   * @param {string} [options.title] - Le titre de la vente
+   * @param {string} [options.description] - La description de la vente
+   * @param {string} [options.owner] - Le propriétaire de la vente
+   * @param {number} [options.price] - Le prix en €
+   * @param {number} [options.quantity] - La quantité disponible
+   * @param {string} [options.location] - La localisation
+   * @param {string} [options.image] - L'URL de l'image
+   * @param {string} [options.categorie] - La catégorie
+   * @return {Promise<Object>} Le résultat de la mise à jour
+   * @throws {Error} Si la requête à la base de données échoue ou si la vente n'existe pas
+   * @example
+   * await db.sells.update(dbo, new ObjectId(507f1f77bcf86cd799439011), {
+   *   price: 120,
+   *   quantity: 2
+   * });
+   */
+  update: async function(dbo, sellId, options) {
+    this.checkSellsOptions(options);
+
+    // Convertis les nombres de String en Number si présents
+    if (options.price !== undefined) {
+      options.price = Number(options.price);
+    }
+    if (options.quantity !== undefined) {
+      options.quantity = Number(options.quantity);
+    }
+    
+    const result = await dbo.collection('sells')
+                            .updateOne({ _id: new ObjectId(sellId) },
+                                       { $set: options }
+                                      );
+  },
+
+  /**
    * 
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
    * @param {Object} id - L'id de la vente
@@ -418,6 +458,31 @@ const user = {
       { username: username },
       { $set: { passwordHash: hashedPassword } }
     );
+  },
+
+  /**
+  * Calcule la moyenne des notes reçues en tant que vendeur.
+   * @async
+   * @param {Object} dbo - L'objet de la base de donnée MongoDB
+   * @param {string} username - Le nom d'utilisateur
+   */
+  getReviewAverage : async function (dbo, username) {
+    const sells = await dbo.collection('sells').find({owner: username, buyers: { $exists: true, $ne: [] }}).toArray();
+    let total = 0;
+    let count = 0;
+  
+    for (const sell of sells) {
+      for (const buyer of sell.buyers) {
+        if (buyer.rating) {
+          total += Number(buyer.rating);
+          count += 1;
+        }
+      }
+    }
+    if (count === 0) {
+      return null;
+    }
+    return total / count;
   },
 
 }

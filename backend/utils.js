@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { documentSort } = require('./document-search.js');
+const { checkUserInput } = require('../backend/check-input.js');
 
 /**
  * Convertis un string en hash (sha256)
@@ -165,6 +166,37 @@ function sort(sells, type) {
   }
 }
 
+/**
+ * Retourne la liste des erreurs lors de la création ou la moddification d'une vente.
+ * @param {string} title - Le titre
+ * @param {string} description - La description
+ * @param {string} address - L'adresse
+ * @param {string} quantity - La quantité (un string qui sera convertis en number plus tard)
+ * @param {string} category - La catégorie
+ * @return {string} Un string de toutes les erreurs séparée par un "\n" 
+ */
+function annonceCreationGetErrorMessage(title, description, address, price, quantity, category) {
+  let error = "";
+  if (!checkUserInput.isValidSellTitle(title)) {
+    error += "Le titre doit faire au moins 3 caractères.\n"
+  }
+  if (!checkUserInput.isValidSellDescription(description)) {
+    error += "La description doit faire au moins 10 caractères.\n"
+  }
+  if (!checkUserInput.isValidSellAddress(address)) {
+    error += "L'adresse doit faire au moins 15 caractères.\n";
+  }
+  if (!checkUserInput.isValidSellPrice(price)) {
+    error += "Le prix doit être positif.\n"
+  }
+  if (!checkUserInput.isValidSellQuantity(quantity)) {
+    error += "La quantité doit être un nombre positif sans virgule.\n"
+  }
+  if (!category) {
+    error += "Une catégorie doit être choisie.\n"
+  }
+  return error;
+}
 
 
 
@@ -173,4 +205,6 @@ module.exports = {
     renderDateToString: renderDateToString,
     search: search,
     sort: sort,
+    annonceCreationGetErrorMessage: annonceCreationGetErrorMessage,
+
 }

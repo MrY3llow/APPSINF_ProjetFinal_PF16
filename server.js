@@ -32,8 +32,8 @@ const upload = multer({
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(bodyParser.urlencoded({ extended: true })); 
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, charset: 'utf-8' })); 
+app.use(bodyParser.json({ charset: 'utf-8' }));
 app.use(session({
   secret: "secretPasswordNoOneShouldHave",
   resave: false,
@@ -46,7 +46,10 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, 'static')));
 
-
+app.use((req, res, next) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  next();
+});
 
 
 // Fonction MAIN asynchrone pour pouvoir charger la base de données
@@ -266,8 +269,8 @@ async function main() {
 
     // Get PROFILE
     app.get('/profile', async function(req, res) {
-      if(req.session.username == undefined) {
-        req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son profile.";
+      if (!req.session.username) {
+        req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son profil.";
         req.session.previousPageBeforeLoginPage = '/profile';
         res.redirect('/login');
       }
@@ -281,6 +284,20 @@ async function main() {
           userBalance: await db.user.getBalance(dbo, req.session.username),
         })
       }
+
+      const username = req.session.username;
+
+      const user = await db.user.getUserFromUsername(dbo, username);
+      const reviewAverage = await db.user.getReviewAverage(dbo, username);
+
+      res.render("layout", {
+        title: "Profil",
+        page: "pages/profile",
+        username: username,
+        user: user,
+        reviewAverage: reviewAverage,
+        error: undefined,
+      });
     });
 
     // POST pour mettre à jour la photo de profile
@@ -378,11 +395,21 @@ async function main() {
       let price = req.body.price;
       let quantity = req.body.quantity;
       let category = req.body.category;
-      let filterInput = req.body.filter;
+      let filterInputWrongEncode = req.body.filter;
       let address = req.body.address;
+      
+      // Correction des accents et caractères spéciaux mal encodés
+      let filterInput = {}
+      if (filterInputWrongEncode) {
+        for (let key in filterInputWrongEncode) {
+            let newKey = key.replace(/Ã©/g, 'é')
+                            .replace(/Ã¨/g, 'è')
+                            .replace(/Ã /g, 'à')
+            filterInput[newKey] = filterInputWrongEncode[key]
+        }
+      }
 
-      let error = "";
-
+      
       // Récupérer l'image uploadée
       let imageData = null;
       if (req.file) {
@@ -393,38 +420,15 @@ async function main() {
           filename: req.file.originalname
         };
       }
-
-
+      
+      
       // Vérification des conditions
-      if (!checkUserInput.isValidSellTitle(title)) {
-        error += "Le titre doit faire au moins 3 caractères.\n"
-      }
-
-      if (!checkUserInput.isValidSellDescription(description)) {
-        error += "La description doit faire au moins 10 caractères.\n"
-      }
-
+      let error = utils.annonceCreationGetErrorMessage(title, description, address, price, quantity, category);
       if (!req.file) {
         error += "Une image est requise.\n";
       }
       else if (req.file.size > 5 * 1024 * 1024) {
         error += "L'image ne doit pas dépasser 5 MB.\n";
-      }
-
-      if (!checkUserInput.isValidSellAddress(address)) {
-        error += "L'adresse doit faire au moins 15 caractères.\n";
-      }
-
-      if (!checkUserInput.isValidSellPrice(price)) {
-        error += "Le prix doit être positif.\n"
-      }
-
-      if (!checkUserInput.isValidSellQuantity(quantity)) {
-        error += "La quantité doit être un nombre positif sans virgule.\n"
-      }
-
-      if (!category) {
-        error += "Une catégorie doit être choisie.\n"
       }
 
       if(!error) { // Si pas d'erreur, tentative de création de l'élément dans la base de donnée.
@@ -460,6 +464,7 @@ async function main() {
           quantityInput: quantity,
           categoryInput: category,
           addressInput: address,
+          filterInput: filterInput,
           error: error,
           userBalance: await db.user.getBalance(dbo, req.session.username),
         });
@@ -508,18 +513,25 @@ async function main() {
 
     // Get PRODUCT PAGE
     app.get('/product/:sellId', async function(req, res) {
-      // Page de démo pour l'instant
-      // Variable pas encore utiliser.
       const sellId = req.params.sellId;
       const sell = await dbo.collection('sells').findOne({ _id: new ObjectId(sellId) });
 
       res.render("layout", {
-        title: "Vente", // Titre qui est affiché dans l'onglet du naviguateur chrome
+        title: "Vente",
         page: "pages/product-page",
         username: req.session.username,
         sell: sell,
         error: null,
         userBalance: await db.user.getBalance(dbo, req.session.username),
+        categoryData: filter.categoryData,
+
+        titleInput: sell.title,
+        descriptionInput: sell.description,
+        priceInput: sell.price,
+        quantityInput: sell.quantity,
+        categoryInput: sell.category,
+        filterInput: sell.filter,
+        addressInput: sell.address,
       })
     });
 
@@ -550,6 +562,75 @@ async function main() {
       }
       res.redirect('/purchase-history');
 
+    });
+
+    // Post PRODUCT UPDATE
+    app.post('/product/:sellId/update', async function(req, res) {
+      let title = req.body.title;
+      let description = req.body.description;
+      let price = req.body.price;
+      let quantity = req.body.quantity;
+      let category = req.body.category;
+      let filterInputWrongEncode = req.body.filter;
+      let address = req.body.address;
+      
+      // Correction des accents et caractères spéciaux mal encodés
+      let filterInput = {}
+      if (filterInputWrongEncode) {
+        for (let key in filterInputWrongEncode) {
+            let newKey = key.replace(/Ã©/g, 'é')
+                            .replace(/Ã¨/g, 'è')
+                            .replace(/Ã /g, 'à')
+            filterInput[newKey] = filterInputWrongEncode[key]
+        }
+      }
+
+      
+      
+      // Vérification des conditions
+      let error = "";
+      error = utils.annonceCreationGetErrorMessage(title, description, address, price, quantity, category)
+      
+      if(!error) { // Si pas d'erreur, tentative d'update de l'élément dans la base de donnée.
+        try {
+          await db.sells.update(dbo, new ObjectId(req.params.sellId), {
+            title: title,
+            description: description,
+            price: price,
+            quantity: quantity,
+            category: category,
+            address: address,
+            filter: filterInput,
+          })
+        } catch (err) {
+          console.error(err);
+          error = +"Une erreur est survenue avec la base de donnée.";
+        }
+      }
+
+      if (error) { // S'il y a une erreur, réaffiche la page avec les données précomplétée et le message d'erreur.
+        const sellId = req.params.sellId;
+        const sell = await dbo.collection('sells').findOne({ _id: new ObjectId(sellId) });
+
+        res.render("layout", {
+          title: "Vente",
+          page: "pages/product-page",
+          username: req.session.username,
+          sell: sell,
+          error: error,
+          categoryData: filter.categoryData,
+
+          titleInput: sell.title,
+          descriptionInput: sell.description,
+          priceInput: sell.price,
+          quantityInput: sell.quantity,
+          categoryInput: sell.category,
+          filterInput: sell.filter,
+          addressInput: sell.address,
+        })
+      } else { // Aucune erreur, alors charge la page du produit
+        res.redirect("/sale-history");
+      }
     });
 
 

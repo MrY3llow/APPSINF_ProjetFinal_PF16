@@ -46,7 +46,7 @@ function renderDateToString(date, format="short", clock=true) {
         options.minute = '2-digit'
       }
   
-      return new Date().toLocaleString('fr-FR', options);
+      return date.toLocaleString('fr-FR', options);
     }
 
     case "short": {
@@ -182,7 +182,7 @@ function annonceCreationGetErrorMessage(title, description, address, price, quan
   }
   if (!checkUserInput.isValidSellDescription(description)) {
     error += "La description doit faire au moins 10 caractères.\n"
-  }
+  }renderDateToString
   if (!checkUserInput.isValidSellAddress(address)) {
     error += "L'adresse doit faire au moins 15 caractères.\n";
   }

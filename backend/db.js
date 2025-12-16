@@ -446,17 +446,17 @@ const user = {
 
 
   /**
-   * Moddifie le montant des fonds de l'utilisateur.
+   * Modifie le montant des fonds de l'utilisateur.
    * @async
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
    * @param {string} username - Le nom d'utilisateur
-   * @param {number} amount - Le montant (positif ou négatif) à ajouter a la valeur actuelle.
+   * @param {number} amount - Le montant (positif ou négatif) à ajouter à la valeur actuelle.
    */
-  addBalance(dbo, username, amount) {
-    dbo.collection('users').updateOne(
+  addBalance: async function(dbo, username, amount) {  // ✅ async function
+    await dbo.collection('users').updateOne(
       { username: username },
       { $inc: { balance: amount } }
-    )
+    );
   },
 
   /**
@@ -465,10 +465,12 @@ const user = {
    * @param {Object} dbo - L'objet de la base de donnée MongoDB
    * @param {string} usernameFrom - Le nom d'utilisateur qui paye
    * @param {string} usernameTo - Le nom d'utilisateur qui recoit.
+   * @param {string} amount - Le montant à transférer
    */
   pay : async function(dbo, usernameFrom, usernameTo, amount) {
     // Vérification que usernameFrom à le montant nécessaire
-    if ((await dbo.collection('users').findOne({ username: usernameFrom })).balance < amount) {
+    let user = await dbo.collection('users').findOne({ username: usernameFrom });
+    if (!user.balance || user.balance < amount) {
       throw(new Error("L'utilisateur n'a pas assez de fonds."));
     }
 

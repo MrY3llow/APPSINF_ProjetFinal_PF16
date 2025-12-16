@@ -32,6 +32,18 @@ const categoryData = {
   "Divers" : [],
 }
 
+/**
+ * Filtres des ventes selons différentes données.
+ * Chaque valeur n'est pas obligatoire
+ * Filtres possibles :
+ * - prix max et min
+ * - la catégorie
+ * - les propriété spécifique de cette catégorie. La catégorie doit impérativement être configuré.
+ * @param {object|undefined} sels - l'objet de la vente
+ * @param {object|undefined} priceMin - le nombre minimum
+ * @param {object|undefined} priceMax- le nombre maximum
+ * @param {Array<object>|undefined} categoryFilters - dictionnaire contenant les filtres spécifique à la catégorie
+ */
 function filter(sells, priceMin, priceMax, category, categoryFilters) {
   let result = [];
 
@@ -56,6 +68,9 @@ function filter(sells, priceMin, priceMax, category, categoryFilters) {
             accept = false;
             break;
           }
+        } else { 
+          accept = false;
+          break;
         }
       }
     }

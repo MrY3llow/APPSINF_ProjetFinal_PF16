@@ -10,19 +10,44 @@
       <%
         let entries = Object.entries(sell.filter);
         entries = entries.filter(([key,value]) => value !== undefined && value !== null);
-
-        if (sell.category === 'Véhicule') {
+        
+        if (sell.category != 'Divers') {
           for (let i=0; i<entries.length; i+=1) {
-            console.log(entries[i][1])
             if (entries[i][1]) {
-              if (entries[i][0] == 'Nombre de roue') {
-                entries[i][1] += ' roues';
-              } 
-              else if (entries[i][0] == 'Kilométrage') {
-                entries[i][1] += ' km';
-              } 
-              else if (entries[i][0] == 'Année') {
-                entries[i][1] = 'Années : ' + entries[i][1];
+              if (sell.category === 'Véhicule') {
+                if (entries[i][0] == 'Nombre de roue') {
+                  entries[i][1] += ' roues';
+                } 
+                else if (entries[i][0] == 'Kilométrage') {
+                  entries[i][1] += ' km';
+                } 
+                else if (entries[i][0] == 'Année') {
+                  entries[i][1] = 'Années : ' + entries[i][1];
+                }
+              }
+              
+              else if (sell.category === 'Immobilier') {
+                if (entries[i][0] == 'Nombre de pièces') {
+                  entries[i][1] = 'Pièces : ' + entries[i][1];
+                }
+                else if (entries[i][0] == 'Surface (m²)') {
+                  entries[i][1] += 'm²';
+                }
+                else if (entries[i][0] == 'Étage') {
+                  entries[i][1] = 'Étages : ' + entries[i][1];
+                }
+                else if (entries[i][0] == 'Chauffage') {
+                  entries[i][1] = 'Chauffage : ' + entries[i][1];
+                }
+              }
+
+              else if (sell.category === 'Électronique') {
+                if (entries[i][0] == "Année d'achat") {
+                  entries[i][1] = "Acheté en : " + entries[i][1];
+                }
+                else if (entries[i][0] == "Capacité stockage (Go)") {
+                  entries[i][1] += " Go";
+                }
               }
             }
             else {
@@ -32,9 +57,11 @@
           }
         }
       %>
-      <p class="card-subtitle">
-        <%= sell.category %> , <%= entries.map(e => e[1]).join(', ') %>
-      </p>
+      <% if (sell.category != 'Divers') { %>
+        <p class="card-subtitle">
+          <%= sell.category %> , <%= entries.map(e => e[1]).join(', ') %>
+        </p>
+      <% } %>
     <% } %>
   
     <%if (origin == "purchase-history") { %>

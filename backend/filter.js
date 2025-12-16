@@ -7,10 +7,27 @@ const categoryData = {
     {"name": "Nombre de roue", "type": "number"},
     {"name": "Kilométrage", "type": "number"},
   ],
-  "Miam" : [
-    {"name": "Typede mial", "type": "select", "values": ["Burger", "Pizza", "Sushi"]},
-    {"name": "Couleur", "type": "select", "values": ["Rouge", "Bleu", "Noir", "Blanc", "Gris", "Vert", "Jaune", "Orange"]},
-    {"name": "Kilo", "type": "number"},
+  "Immobilier" : [
+    {"name": "Type", "type": "select", "values": ["Appartement", "Maison", "Studio", "Duplex", "Villa"]},
+    {"name": "Nombre de pièces", "type": "number"},
+    {"name": "Surface (m²)", "type": "number"},
+    {"name": "Étage", "type": "number"},
+    {"name": "État", "type": "select", "values": ["Neuf", "Bon état", "À rénover"]},
+    {"name": "Chauffage", "type": "select", "values": ["Gaz", "Electrique", "Fuel", "Pompe à chaleur"]},
+  ],
+  "Électronique" : [
+    {"name": "Type", "type": "select", "values": ["Smartphone", "Ordinateur portable", "Tablette", "Console", "Télévision"]},
+    {"name": "Marque", "type": "select", "values": ["Apple", "Samsung", "Sony", "Microsoft", "LG", "HP", "Dell"]},
+    {"name": "État", "type": "select", "values": ["Neuf", "Comme neuf", "Bon état", "Satisfaisant"]},
+    {"name": "Année d'achat", "type": "number"},
+    {"name": "Capacité stockage (Go)", "type": "number"},
+  ],
+  "Vêtements" : [
+    {"name": "Type", "type": "select", "values": ["Pantalon", "T-shirt", "Robe", "Veste", "Chaussures", "Accessoire"]},
+    {"name": "Taille", "type": "select", "values": ["XS", "S", "M", "L", "XL", "XXL"]},
+    {"name": "Couleur", "type": "select", "values": ["Rouge", "Bleu", "Noir", "Blanc", "Gris", "Vert", "Jaune", "Orange", "Rose", "Violet"]},
+    {"name": "Marque", "type": "select", "values": ["Zara", "H&M", "Nike", "Adidas", "Uniqlo", "Autre"]},
+    {"name": "État", "type": "select", "values": ["Neuf avec étiquette", "Neuf sans étiquette", "Excellent état", "Bon état"]},
   ],
   "Divers" : [],
 }

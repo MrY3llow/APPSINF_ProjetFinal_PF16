@@ -52,6 +52,7 @@ Nous utilisons la base de donnée `LouvainLaVente` comme base de donnée princip
 1. Setup de la base de donnée de base avec quelques données d'exemples.
 
 > `mongoimport --db=LouvainLaVente --collection=users --file=./setup-data/users.json --jsonArray`
+> Le mot de passe des utilisateurs préconfiguré est password.
 
 > `mongoimport --db=LouvainLaVente --collection=sells --file=./setup-data/sells.json --jsonArray`
 

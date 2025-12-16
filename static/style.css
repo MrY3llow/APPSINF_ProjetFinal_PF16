@@ -750,3 +750,28 @@ img{ max-width:100%; display:block; }
     flex: 1;
   }
 }
+
+
+
+.hidden-text {
+  color: var(--bg);
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.hidden-text::selection {
+  color: var(--text);
+  background: var(--primary);
+}
+
+
+.profile-points {
+  cursor: pointer;
+}
+
+.hidden-message {
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 8px;
+}

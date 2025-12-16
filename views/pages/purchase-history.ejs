@@ -1,15 +1,14 @@
 <main class="container">
-
   <section class="card">
     <header class="card-head">
       <h1 class="card-title">Mon historique d'achats</h1>
     </header>
-
-    <!-- Affiche les achats en utilisant le modèle -->
-    <% for (let sell of sells) { %>
-      <%- include('../partials/product-card', {sell: sell, username: username, origin: "purchase-history"}) %>
-    <% } %>
-
+    <div class="products-grid">
+      <!-- Affiche les achats en utilisant le modèle -->
+      <% for (let sell of sells) { %>
+        <%- include('../partials/product-card', {sell: sell, username: username, origin: "purchase-history"}) %>
+      <% } %>
+    </div>
     <!-- Si aucun achat -->
     <% if (sells.length == 0) { %>
       <p>Vous n'avez réaliser aucune achat pour l'instant.<p>

@@ -71,8 +71,8 @@ img{ max-width:100%; display:block; }
 
 .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; }
 .brand-logo{ 
-  width:100px; 
-  height:50px; 
+  width: 100px; 
+  height: 50px; 
   object-fit:cover; 
   border: 1.5px solid var(--text); 
   border-radius: 4px; 
@@ -258,7 +258,15 @@ img{ max-width:100%; display:block; }
 /* style pour le changement de mdp dans profile */
 #change-password-btn {
   margin-top: 10px;
-  width: 10vw !important;
+  width: 100%;
+  max-width: 300px;
+}
+
+@media (max-width: 768px) {
+  #change-password-btn {
+    width: 100%;
+    max-width: none;
+  }
 }
 
 #change-password-field {
@@ -267,7 +275,8 @@ img{ max-width:100%; display:block; }
   padding: 12px; 
   margin-bottom: 4vh;
   margin-top: 2vh;
-  width: fit-content;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .card{
@@ -406,8 +415,8 @@ img{ max-width:100%; display:block; }
 
 .rating {
   display: flex;
-  flex-direction: row-reverse; /* Inverse l'affichage visuel */
-  justify-content: flex-end; /* Aligne à gauche */
+  flex-direction: row-reverse;
+  justify-content: flex-end;
   gap: 5px;
   font-size: 25px;
 }
@@ -431,7 +440,8 @@ img{ max-width:100%; display:block; }
 }
 
 .input {
-    width: 500px;
+    width: 100%;
+    max-width: 500px;
 }
 
 .input-area {
@@ -459,7 +469,7 @@ img{ max-width:100%; display:block; }
 }
 
 .image-input {
-  display: none; /* Cache l'input file par défaut */
+  display: none;
 }
 
 .image-upload-btn {
@@ -480,7 +490,7 @@ img{ max-width:100%; display:block; }
 .preview-img {
   display: none;
   width: auto;
-  max-height: 150px; /* Hauteur max */
+  max-height: 150px;
   border-radius: 8px;
   border: 1px solid var(--border);
 }
@@ -510,29 +520,41 @@ img{ max-width:100%; display:block; }
 /*--------------------------*/
 
 .page-layout {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  width: 100%;
-  gap: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.page-layout .container {
+  flex: 1;
+  max-width: none;
+  width: auto;
+  padding: 24px;
+  padding-bottom: 40px;
 }
 
 .left-space-wrapper {
+  flex-shrink: 0;
   display: flex;
   align-items: flex-start;  
   height: auto;        
-  min-height: 90vh; 
-  padding-top: 24px;    
+  min-height: auto;
+  padding-top: 24px;
+  padding-left: 0;
 }
 
 .left-space {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 0 16px 16px 0; 
+  border-radius: 16px;
   box-shadow: var(--shadow);
   padding: 24px;
-  width: fit-content;
+  width: 280px;
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 80px;
+  height: fit-content;
 }
 
 .left-space .toolbox-inputs {
@@ -547,7 +569,6 @@ img{ max-width:100%; display:block; }
   flex-direction: column;
   gap: 5px; 
 }
-
 
 .left-space .toolbox-inputs .input {
   width: 100%;
@@ -643,6 +664,7 @@ img{ max-width:100%; display:block; }
   color: var(--text);
   cursor: pointer;
 }
+
 /* Image of products */
 
 .product-image {
@@ -675,6 +697,13 @@ img{ max-width:100%; display:block; }
 
 .product-not-available-text {
   color: #d32f2f;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  max-width: 700px;
 }
 
 
@@ -735,8 +764,40 @@ img{ max-width:100%; display:block; }
   border-color: var(--primary);
 }
 
+/* Cartes produits pour purchase-history et sale-history */
+.card:has(.product-image) {
+  width: fit-content;
+  margin: 20px auto;
+}
+
+.products-grid .card {
+  width: auto;
+  margin: 20px 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .page-layout {
+    flex-direction: column;
+  }
+  
+  .left-space-wrapper {
+    flex-shrink: 1;
+    padding-left: 0;
+    width: 100%;
+  }
+  
+  .left-space {
+    width: 100%;
+    border-radius: 16px;
+    position: static;
+    max-height: none;
+  }
+  
+  .page-layout .container {
+    padding: 0 12px;
+  }
+  
   .card-head-content {
     flex-direction: column;
     align-items: stretch;

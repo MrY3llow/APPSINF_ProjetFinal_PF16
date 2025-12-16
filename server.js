@@ -127,7 +127,7 @@ async function main() {
       // // Applique le tri (date, prix)
       let sortType = req.query.sort;
       if (sortType) {
-        sells = utils.sort(sells, sortType)
+        sells = await utils.sort(sells, sortType, dbo)
       }
 
 

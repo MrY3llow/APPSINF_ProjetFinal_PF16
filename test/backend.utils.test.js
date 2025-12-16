@@ -338,7 +338,7 @@ describe("sort()", () => {
   describe("Rating sorting", () => {
     
     it("Should sort by rating (highest first)", () => {
-      const result = utils.sort(mockSells, "rating");
+      const result = utils.sort(mockSells, "rating", dbo);
       
       expect(result[0].rating).toBe(5.0);
       expect(result[1].rating).toBe(4.5);

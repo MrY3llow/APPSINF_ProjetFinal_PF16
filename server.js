@@ -138,7 +138,6 @@ async function main() {
         sells: sells,
         categoryData: filter.categoryData,
         userBalance: await db.user.getBalance(dbo, req.session.username),
-
       })
     });
 
@@ -273,7 +272,17 @@ async function main() {
       if (!req.session.username) {
         req.session.loginErrorMessage = "Une connexion est nécessaire pour voir son profil.";
         req.session.previousPageBeforeLoginPage = '/profile';
-        return res.redirect('/login');
+        res.redirect('/login');
+      }
+      else {
+        res.render("layout", {
+          title: "Inscription",
+          page: "pages/profile",
+          username: req.session.username,
+          user: await db.user.getUserFromUsername(dbo, req.session.username),
+          error: undefined,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
+        })
       }
 
       const username = req.session.username;
@@ -344,13 +353,18 @@ async function main() {
       }
 
       let amount = Number(req.params.value);
+      let balance = await db.user.getBalance(dbo, req.session.username);
+      console.log(balance);
+      if (balance + amount < 0) {
+        amount = -balance;
+      }
       await db.user.addBalance(dbo, req.session.username, amount);
       res.redirect('/profile');
     });
 
 
     // Get ANNONCE CREATION
-    app.get('/annonce-creation', function(req, res) {
+    app.get('/annonce-creation', async function(req, res) {
       if(req.session.username == undefined) {
         req.session.loginErrorMessage = "Une connexion est nécessaire pour créer une annonce.";
         req.session.previousPageBeforeLoginPage = '/annonce-creation';
@@ -510,6 +524,7 @@ async function main() {
         username: req.session.username,
         sell: sell,
         error: null,
+        userBalance: await db.user.getBalance(dbo, req.session.username),
         categoryData: filter.categoryData,
 
         titleInput: sell.title,
@@ -531,6 +546,7 @@ async function main() {
       try {
         await db.sells.buy(dbo, new ObjectId(sellId), username)
       } catch (err) {
+        console.error(err);
         let error = "";
         if (err.message == "La vente n'est pas achetable.") {
           error += "Vous ne pouvez pas acheter ceci.\n";

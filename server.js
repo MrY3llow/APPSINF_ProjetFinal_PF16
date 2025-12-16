@@ -137,6 +137,8 @@ async function main() {
         username: req.session.username,
         sells: sells,
         categoryData: filter.categoryData,
+        userBalance: await db.user.getBalance(dbo, req.session.username),
+
       })
     });
 
@@ -161,6 +163,7 @@ async function main() {
           username: undefined,
           usernameInput: req.query.username,
           error: req.session.loginErrorMessage,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         })
       }
     });
@@ -187,6 +190,7 @@ async function main() {
           username: req.session.username,
           usernameInput: username,
           error: req.session.loginErrorMessage,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         });
       }
     });
@@ -202,6 +206,7 @@ async function main() {
         fullnameInput: null,
         username: req.session.username,
         error: undefined,
+        userBalance: await db.user.getBalance(dbo, req.session.username),
       })
     });
 
@@ -252,6 +257,7 @@ async function main() {
           emailInput: email,
           error: req.session.signupErrorMessage,
           username: req.session.username,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         });
       
       // Aucune erreur > Charge la page d'acceuil en étant connecté
@@ -302,6 +308,7 @@ async function main() {
           data: req.file.buffer.toString('base64'), // Conversion en Base64
           size: req.file.size,
           filename: req.file.originalname
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         };
       }
 
@@ -363,6 +370,7 @@ async function main() {
           categoryInput: null,
           filterInput: null,
           addressInput: null,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         })
       }
     });
@@ -423,6 +431,7 @@ async function main() {
             image: imageData,
             filter: filterInput,
             date: new Date(),
+            userBalance: await db.user.getBalance(dbo, req.session.username),
           })
         } catch (err) {
           console.error(err);
@@ -445,6 +454,7 @@ async function main() {
           addressInput: address,
           filterInput: filterInput,
           error: error,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         });
       } else { // Aucune erreur, alors charge la page d'acceuil.
         res.redirect("/");
@@ -459,6 +469,7 @@ async function main() {
         page: "pages/leaderboard",
         username: req.session.username,
         leaderboard: await db.leaderboard.getFirst(dbo),
+        userBalance: await db.user.getBalance(dbo, req.session.username),
       })
     });
 
@@ -471,6 +482,7 @@ async function main() {
         page: "pages/purchase-history",
         username: req.session.username,
         sells: sells,
+        userBalance: await db.user.getBalance(dbo, req.session.username),
       })
     });
 
@@ -482,6 +494,7 @@ async function main() {
         page: "pages/sale-history",
         username: req.session.username,
         sells: sells,
+        userBalance: await db.user.getBalance(dbo, req.session.username),
       })
     });
 
@@ -506,6 +519,7 @@ async function main() {
         categoryInput: sell.category,
         filterInput: sell.filter,
         addressInput: sell.address,
+        userBalance: await db.user.getBalance(dbo, req.session.username),
       })
     });
 
@@ -529,6 +543,7 @@ async function main() {
           username: req.session.username,
           sell: sell,
           error: error,
+          userBalance: await db.user.getBalance(dbo, req.session.username),
         })
         return;
       }

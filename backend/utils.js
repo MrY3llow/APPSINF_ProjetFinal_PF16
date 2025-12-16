@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { documentSort } = require('./document-search.js');
-const { checkUserInput } = require('../backend/check-input.js');
+const { checkUserInput } = require('./check-input.js');
 
 /**
  * Convertis un string en hash (sha256)
@@ -141,8 +141,9 @@ function search(sells, input) {
  * └─ "date-desc"  ──>  La date décroissante. Les ventes les plus récentes en premières.
  * @param {Array<Object>} sells - La liste des dictionnaires des ventes.
  * @param {string} type - Le type de la vente.
+ * @param {Object} dbo - L'objet de la base de donnée MongoDB. Utile pour les points
  */
-function sort(sells, type) {
+async function sort(sells, type, dbo) {
   const sorted = sells.slice();
   
   switch(type) {
@@ -153,7 +154,14 @@ function sort(sells, type) {
       return sorted.sort((a, b) => b.price - a.price);
     
     case "rating":
-      return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      const db = require('./db.js');
+      let userAverage = {};
+      for (let sell of sorted) {
+        if (!userAverage[sell.owner]) {
+          userAverage[sell.owner] = await db.user.getReviewAverage(dbo, sell.owner);
+        }
+      }
+      return sorted.sort((a, b) => (userAverage[b.owner] || 0) - (userAverage[a.owner] || 0));
     
     case "date-asc":
       return sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
